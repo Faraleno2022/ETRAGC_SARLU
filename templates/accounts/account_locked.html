@@ -1,0 +1,54 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Compte Verrouillé - ETRAGC{% endblock %}
+
+{% block login_content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-lock fa-2x mb-3"></i><br>
+                        Compte Temporairement Verrouillé
+                    </h4>
+                </div>
+                <div class="card-body text-center p-5">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                        <h5>Trop de tentatives de connexion échouées</h5>
+                    </div>
+                    
+                    <p class="lead mb-4">
+                        Votre compte a été temporairement verrouillé pour des raisons de sécurité.
+                    </p>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-clock me-2"></i>
+                        <strong>Temps de blocage:</strong> 1 heure
+                    </div>
+                    
+                    <p class="text-muted mb-4">
+                        Après ce délai, vous pourrez réessayer de vous connecter.<br>
+                        Si vous pensez qu'il s'agit d'une erreur, contactez l'administrateur.
+                    </p>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'core:home' %}" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Retour à l'accueil
+                        </a>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-muted small">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Cette mesure de sécurité protège votre compte contre les accès non autorisés.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

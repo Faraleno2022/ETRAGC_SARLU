@@ -1,0 +1,122 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Modifier Devis{% else %}Nouveau Devis{% endif %} - ETRAGC{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-file-invoice me-2"></i>
+                        {% if form.instance.pk %}Modifier le Devis{% else %}Nouveau Devis{% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="devisForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.client.id_for_label }}" class="form-label">Client *</label>
+                                {{ form.client }}
+                                {% if form.client.errors %}
+                                    <div class="text-danger">{{ form.client.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.projet.id_for_label }}" class="form-label">Projet</label>
+                                {{ form.projet }}
+                                {% if form.projet.errors %}
+                                    <div class="text-danger">{{ form.projet.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date_emission.id_for_label }}" class="form-label">Date d'émission *</label>
+                                {{ form.date_emission }}
+                                {% if form.date_emission.errors %}
+                                    <div class="text-danger">{{ form.date_emission.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date_validite.id_for_label }}" class="form-label">Date de validité *</label>
+                                {{ form.date_validite }}
+                                {% if form.date_validite.errors %}
+                                    <div class="text-danger">{{ form.date_validite.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.conditions_paiement.id_for_label }}" class="form-label">Conditions de paiement</label>
+                                {{ form.conditions_paiement }}
+                                {% if form.conditions_paiement.errors %}
+                                    <div class="text-danger">{{ form.conditions_paiement.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                                {{ form.notes }}
+                                {% if form.notes.errors %}
+                                    <div class="text-danger">{{ form.notes.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h5 class="mb-3"><i class="fas fa-list me-2"></i>Lignes du devis</h5>
+                        
+                        {{ formset.management_form }}
+                        <div id="lignes-container">
+                            {% for form in formset %}
+                                <div class="ligne-devis border rounded p-3 mb-3">
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <label class="form-label">Description</label>
+                                            {{ form.description }}
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Quantité</label>
+                                            {{ form.quantite }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Prix unitaire</label>
+                                            {{ form.prix_unitaire_ht }}
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            {{ form.DELETE }}
+                                            <label class="form-check-label ms-2">Supprimer</label>
+                                        </div>
+                                    </div>
+                                    {{ form.id }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Enregistrer
+                            </button>
+                            <a href="{% url 'invoicing:devis_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

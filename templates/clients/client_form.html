@@ -1,0 +1,103 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if object %}Modifier{% else %}Nouveau{% endif %} Client - ETRAGC SARLU{% endblock %}
+{% block page_title %}{% if object %}Modifier{% else %}Nouveau{% endif %} Client{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user me-2"></i>{% if object %}Modifier le client{% else %}Nouveau client{% endif %}
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nom_complet.id_for_label }}" class="form-label">Nom complet *</label>
+                            {{ form.nom_complet }}
+                            {% if form.nom_complet.errors %}
+                            <div class="text-danger small">{{ form.nom_complet.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.entreprise.id_for_label }}" class="form-label">Entreprise</label>
+                            {{ form.entreprise }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telephone.id_for_label }}" class="form-label">Téléphone</label>
+                            {{ form.telephone }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telephone_2.id_for_label }}" class="form-label">Téléphone 2</label>
+                            {{ form.telephone_2 }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.adresse.id_for_label }}" class="form-label">Adresse</label>
+                        {{ form.adresse }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.ville.id_for_label }}" class="form-label">Ville</label>
+                            {{ form.ville }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.pays.id_for_label }}" class="form-label">Pays</label>
+                            {{ form.pays }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nif.id_for_label }}" class="form-label">NIF</label>
+                            {{ form.nif }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.rccm.id_for_label }}" class="form-label">RCCM</label>
+                            {{ form.rccm }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                        {{ form.notes }}
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        {{ form.actif }}
+                        <label class="form-check-label" for="{{ form.actif.id_for_label }}">
+                            Client actif
+                        </label>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'clients:list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

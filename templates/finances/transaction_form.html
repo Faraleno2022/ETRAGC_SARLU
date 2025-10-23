@@ -1,0 +1,88 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Nouvelle Transaction - ETRAGC SARLU{% endblock %}
+{% block page_title %}Nouvelle Transaction{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-money-bill-wave me-2"></i>Enregistrer une transaction
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.projet.id_for_label }}" class="form-label">Projet *</label>
+                            {{ form.projet }}
+                            {% if form.projet.errors %}
+                            <div class="text-danger small">{{ form.projet.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.type.id_for_label }}" class="form-label">Type *</label>
+                            {{ form.type }}
+                            {% if form.type.errors %}
+                            <div class="text-danger small">{{ form.type.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.montant.id_for_label }}" class="form-label">Montant (GNF) *</label>
+                            {{ form.montant }}
+                            {% if form.montant.errors %}
+                            <div class="text-danger small">{{ form.montant.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.date_transaction.id_for_label }}" class="form-label">Date *</label>
+                            {{ form.date_transaction }}
+                            {% if form.date_transaction.errors %}
+                            <div class="text-danger small">{{ form.date_transaction.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.mode_paiement.id_for_label }}" class="form-label">Mode de paiement *</label>
+                            {{ form.mode_paiement }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.reference.id_for_label }}" class="form-label">Référence</label>
+                            {{ form.reference }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.piece_justificative.id_for_label }}" class="form-label">Pièce justificative</label>
+                        {{ form.piece_justificative }}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'finances:transaction_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

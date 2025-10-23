@@ -1,0 +1,217 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}{{ projet.code_projet }} - ETRAGC SARLU{% endblock %}
+{% block page_title %}Détails du Projet{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <a href="{% url 'projects:list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+        <a href="{% url 'projects:update' projet.pk %}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>Modifier
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations Générales</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Code Projet:</strong><br>
+                        <span class="fs-5 text-primary">{{ projet.code_projet }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Statut:</strong><br>
+                        <span class="badge {{ projet.get_statut_badge_class }} fs-6">{{ projet.get_statut_display }}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Nom du Projet:</strong><br>
+                    {{ projet.nom_projet }}
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Client:</strong><br>
+                        <a href="{% url 'clients:detail' projet.client.pk %}">{{ projet.client }}</a>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Responsable:</strong><br>
+                        {{ projet.responsable|default:"Non assigné" }}
+                    </div>
+                </div>
+                
+                {% if projet.description %}
+                <div class="mb-3">
+                    <strong>Description:</strong><br>
+                    {{ projet.description }}
+                </div>
+                {% endif %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Date de début:</strong><br>
+                        {{ projet.date_debut|date:"d/m/Y"|default:"Non définie" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date de fin prévue:</strong><br>
+                        {{ projet.date_fin_prevue|date:"d/m/Y"|default:"Non définie" }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Avancement:</strong>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ projet.pourcentage_avancement }}%;" 
+                             aria-valuenow="{{ projet.pourcentage_avancement }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ projet.pourcentage_avancement }}%
+                        </div>
+                    </div>
+                </div>
+                
+                {% if projet.adresse_chantier %}
+                <div class="mb-3">
+                    <strong>Adresse du chantier:</strong><br>
+                    {{ projet.adresse_chantier }}<br>
+                    {% if projet.ville_chantier %}{{ projet.ville_chantier }}{% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Finances</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Budget Prévu</small>
+                    <h5 class="text-primary">{{ projet.montant_prevu|floatformat:0|intcomma }} GNF</h5>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Total Dépôts</small>
+                    <h5 class="text-success">{{ total_depots|floatformat:0|intcomma }} GNF</h5>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Total Retraits</small>
+                    <h5 class="text-danger">{{ total_retraits|floatformat:0|intcomma }} GNF</h5>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Solde Disponible</small>
+                    <h5 class="text-info">{{ solde_disponible|floatformat:0|intcomma }} GNF</h5>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Total Dépenses</small>
+                    <h5>{{ total_depenses|floatformat:0|intcomma }} GNF</h5>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Budget Consommé</small>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar {% if pourcentage_budget_consomme > 100 %}bg-danger{% elif pourcentage_budget_consomme > 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                             role="progressbar" style="width: {{ pourcentage_budget_consomme|floatformat:0 }}%;">
+                            {{ pourcentage_budget_consomme|floatformat:1 }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Transactions Récentes</h6>
+            </div>
+            <div class="card-body p-0">
+                {% if transactions_recentes %}
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions_recentes %}
+                            <tr>
+                                <td>{{ transaction.date_transaction|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if transaction.type == 'Dépôt' %}
+                                    <span class="badge bg-success">{{ transaction.type }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ transaction.type }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ transaction.montant|floatformat:0|intcomma }} GNF</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted py-3">Aucune transaction</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-receipt me-2"></i>Dépenses Récentes</h6>
+            </div>
+            <div class="card-body p-0">
+                {% if depenses_recentes %}
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Catégorie</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for depense in depenses_recentes %}
+                            <tr>
+                                <td>{{ depense.date_depense|date:"d/m/Y" }}</td>
+                                <td>{{ depense.categorie.nom }}</td>
+                                <td>{{ depense.montant|floatformat:0|intcomma }} GNF</td>
+                                <td><span class="badge {{ depense.get_statut_badge_class }}">{{ depense.get_statut_display }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted py-3">Aucune dépense</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

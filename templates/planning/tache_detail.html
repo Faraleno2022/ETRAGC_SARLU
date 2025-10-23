@@ -1,0 +1,186 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ tache.nom_tache }} - ETRAGC{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-tasks me-2"></i>{{ tache.nom_tache }}</h2>
+                <div>
+                    <a href="{% url 'planning:tache_update' tache.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Modifier
+                    </a>
+                    <a href="{% url 'planning:tache_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Projet:</strong><br>
+                            {{ tache.projet.nom_projet }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Responsable:</strong><br>
+                            {% if tache.responsable %}
+                                {{ tache.responsable.get_full_name }}
+                            {% else %}
+                                <span class="text-muted">Non assigné</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <strong>Description:</strong><br>
+                            {{ tache.description|default:"Aucune description"|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Date de début:</strong><br>
+                            {{ tache.date_debut|date:"d/m/Y" }}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Date de fin prévue:</strong><br>
+                            {{ tache.date_fin_prevue|date:"d/m/Y" }}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Date de fin réelle:</strong><br>
+                            {% if tache.date_fin_reelle %}
+                                {{ tache.date_fin_reelle|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">Non terminée</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Durée prévue:</strong><br>
+                            {{ tache.get_duree_prevue_jours }} jours
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Durée réelle:</strong><br>
+                            {% if tache.date_fin_reelle %}
+                                {{ tache.get_duree_reelle_jours }} jours
+                            {% else %}
+                                <span class="text-muted">En cours</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Retard:</strong><br>
+                            {% if tache.is_en_retard %}
+                                <span class="badge bg-danger">{{ tache.get_jours_retard }} jours</span>
+                            {% else %}
+                                <span class="badge bg-success">À jour</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if sous_taches %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Sous-tâches</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Statut</th>
+                                    <th>Progression</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sous_tache in sous_taches %}
+                                    <tr>
+                                        <td>{{ sous_tache.nom_tache }}</td>
+                                        <td><span class="badge {{ sous_tache.get_statut_badge_class }}">{{ sous_tache.get_statut_display }}</span></td>
+                                        <td>{{ sous_tache.pourcentage_progression }}%</td>
+                                        <td>
+                                            <a href="{% url 'planning:tache_detail' sous_tache.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Statut</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Priorité:</strong><br>
+                        <span class="badge {{ tache.get_priorite_badge_class }} fs-6">{{ tache.get_priorite_display }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Statut:</strong><br>
+                        <span class="badge {{ tache.get_statut_badge_class }} fs-6">{{ tache.get_statut_display }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Progression:</strong><br>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ tache.pourcentage_progression }}%;" aria-valuenow="{{ tache.pourcentage_progression }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ tache.pourcentage_progression }}%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if tache.tache_parent %}
+                    <div class="mb-3">
+                        <strong>Tâche parente:</strong><br>
+                        <a href="{% url 'planning:tache_detail' tache.tache_parent.pk %}">{{ tache.tache_parent.nom_tache }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Historique</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small mb-2">
+                        <strong>Créée le:</strong><br>
+                        {{ tache.date_creation|date:"d/m/Y à H:i" }}
+                    </p>
+                    <p class="small mb-0">
+                        <strong>Modifiée le:</strong><br>
+                        {{ tache.date_modification|date:"d/m/Y à H:i" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Accueil - ETRAGC SARLU{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-image-container {
+        width: 100%;
+        margin: 0 -12px 2rem -12px;
+        padding: 0;
+    }
+    
+    .company-image {
+        width: 100%;
+        height: 70vh;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        margin: 0;
+        padding: 0;
+        line-height: 0;
+    }
+    
+    .welcome-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-image-container" style="margin-top: -1rem;">
+    <img src="{% static 'images/images.jpg' %}" alt="ETRAGC - Travaux de Génie Civil" class="company-image">
+</div>
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="welcome-card">
+                <h2 class="text-primary mb-4">
+                    <i class="fas fa-hand-wave me-2"></i>Bienvenue sur votre plateforme de gestion
+                </h2>
+                <p class="lead text-muted mb-4">
+                    Gérez efficacement vos projets, clients, finances et personnel en un seul endroit.
+                </p>
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3">
+                            <i class="fas fa-project-diagram fa-3x text-primary mb-3"></i>
+                            <h5>Projets</h5>
+                            <p class="small text-muted">Suivi complet de vos chantiers</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3">
+                            <i class="fas fa-users fa-3x text-success mb-3"></i>
+                            <h5>Clients</h5>
+                            <p class="small text-muted">Gestion de votre portefeuille</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3">
+                            <i class="fas fa-money-bill-wave fa-3x text-warning mb-3"></i>
+                            <h5>Finances</h5>
+                            <p class="small text-muted">Suivi de trésorerie</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3">
+                            <i class="fas fa-user-hard-hat fa-3x text-info mb-3"></i>
+                            <h5>Personnel</h5>
+                            <p class="small text-muted">Gestion des équipes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

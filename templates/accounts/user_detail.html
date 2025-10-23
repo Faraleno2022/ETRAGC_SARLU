@@ -1,0 +1,164 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ user_obj.get_full_name }} - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-3">
+        <div class="col">
+            <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Retour
+            </a>
+            {% if user.is_admin %}
+            <a href="{% url 'accounts:user_update' user_obj.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Modifier
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if user_obj.photo_profil %}
+                    <img src="{{ user_obj.photo_profil.url }}" alt="{{ user_obj.get_full_name }}" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
+                    {% else %}
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-5x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <h4>{{ user_obj.get_full_name }}</h4>
+                    <p class="text-muted">@{{ user_obj.username }}</p>
+                    
+                    <span class="badge bg-primary mb-2">{{ user_obj.get_role_display }}</span>
+                    
+                    {% if user_obj.actif %}
+                    <span class="badge bg-success">Actif</span>
+                    {% else %}
+                    <span class="badge bg-danger">Inactif</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Nom d'utilisateur:</strong><br>
+                            {{ user_obj.username }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Email:</strong><br>
+                            {{ user_obj.email|default:"Non renseigné" }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Prénom:</strong><br>
+                            {{ user_obj.first_name|default:"Non renseigné" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Nom:</strong><br>
+                            {{ user_obj.last_name|default:"Non renseigné" }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Rôle:</strong><br>
+                            <span class="badge bg-primary">{{ user_obj.get_role_display }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Téléphone:</strong><br>
+                            {{ user_obj.telephone|default:"Non renseigné" }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date d'inscription:</strong><br>
+                            {{ user_obj.date_joined|date:"d/m/Y H:i" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Dernière connexion:</strong><br>
+                            {{ user_obj.last_login|date:"d/m/Y H:i"|default:"Jamais" }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Statut:</strong><br>
+                            {% if user_obj.actif %}
+                            <span class="badge bg-success">Compte actif</span>
+                            {% else %}
+                            <span class="badge bg-danger">Compte inactif</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Permissions:</strong><br>
+                            {% if user_obj.is_superuser %}
+                            <span class="badge bg-danger">Superutilisateur</span>
+                            {% elif user_obj.is_staff %}
+                            <span class="badge bg-warning">Staff</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Utilisateur</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Permissions du Rôle</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_obj.role == 'Admin' %}
+                    <ul>
+                        <li>Accès complet à toutes les fonctionnalités</li>
+                        <li>Gestion des utilisateurs</li>
+                        <li>Configuration du système</li>
+                        <li>Validation des dépenses</li>
+                    </ul>
+                    {% elif user_obj.role == 'Manager' %}
+                    <ul>
+                        <li>Gestion des projets</li>
+                        <li>Gestion des clients</li>
+                        <li>Validation des dépenses</li>
+                        <li>Consultation des rapports</li>
+                    </ul>
+                    {% elif user_obj.role == 'Comptable' %}
+                    <ul>
+                        <li>Gestion des finances</li>
+                        <li>Validation des dépenses</li>
+                        <li>Génération de rapports financiers</li>
+                        <li>Gestion des fournisseurs</li>
+                    </ul>
+                    {% elif user_obj.role == 'Chef de Chantier' %}
+                    <ul>
+                        <li>Consultation des projets</li>
+                        <li>Enregistrement des dépenses</li>
+                        <li>Gestion du personnel sur chantier</li>
+                        <li>Mise à jour de l'avancement</li>
+                    </ul>
+                    {% elif user_obj.role == 'Lecteur' %}
+                    <ul>
+                        <li>Consultation uniquement</li>
+                        <li>Pas de modification</li>
+                        <li>Accès aux rapports</li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

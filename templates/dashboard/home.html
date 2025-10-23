@@ -1,0 +1,275 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Tableau de bord - ETRAGC SARLU{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Statistiques principales -->
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Total Projets</p>
+                        <h3 class="mb-0 fw-bold">{{ total_projets }}</h3>
+                    </div>
+                    <div class="text-primary">
+                        <i class="fas fa-project-diagram fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Projets Actifs</p>
+                        <h3 class="mb-0 fw-bold">{{ projets_actifs }}</h3>
+                    </div>
+                    <div class="text-success">
+                        <i class="fas fa-tasks fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Clients</p>
+                        <h3 class="mb-0 fw-bold">{{ total_clients }}</h3>
+                    </div>
+                    <div class="text-info">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Dépenses en attente</p>
+                        <h3 class="mb-0 fw-bold">{{ depenses_en_attente }}</h3>
+                    </div>
+                    <div class="text-warning">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistiques financières -->
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Total Dépôts</h6>
+                <h4 class="fw-bold text-success">{{ total_depots|floatformat:0|intcomma }} GNF</h4>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Total Retraits</h6>
+                <h4 class="fw-bold text-danger">{{ total_retraits|floatformat:0|intcomma }} GNF</h4>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Solde Global</h6>
+                <h4 class="fw-bold text-primary">{{ solde_global|floatformat:0|intcomma }} GNF</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Projets récents -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-project-diagram me-2"></i>Projets Récents</span>
+                <a href="{% url 'projects:list' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                {% if projets_recents %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Nom</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for projet in projets_recents %}
+                            <tr>
+                                <td><a href="{% url 'projects:detail' projet.pk %}">{{ projet.code_projet }}</a></td>
+                                <td>{{ projet.nom_projet|truncatewords:5 }}</td>
+                                <td><span class="badge {{ projet.get_statut_badge_class }}">{{ projet.get_statut_display }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted py-4">Aucun projet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Transactions récentes -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-money-bill-wave me-2"></i>Transactions Récentes</span>
+                <a href="{% url 'finances:transaction_list' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                {% if transactions_recentes %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions_recentes %}
+                            <tr>
+                                <td>{{ transaction.date_transaction|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if transaction.type == 'Dépôt' %}
+                                    <span class="badge bg-success">{{ transaction.type }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ transaction.type }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ transaction.montant|floatformat:0|intcomma }} GNF</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted py-4">Aucune transaction</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alertes -->
+{% if projets_en_retard or projets_budget_depasse %}
+<div class="row">
+    {% if projets_en_retard %}
+    <div class="col-md-6 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-white">
+                <i class="fas fa-exclamation-triangle me-2"></i>Projets en Retard
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for projet in projets_en_retard %}
+                    <a href="{% url 'projects:detail' projet.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ projet.code_projet }} - {{ projet.nom_projet|truncatewords:5 }}</span>
+                            <span class="text-muted small">{{ projet.date_fin_prevue|date:"d/m/Y" }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if projets_budget_depasse %}
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>Budget Dépassé
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for projet in projets_budget_depasse %}
+                    <a href="{% url 'projects:detail' projet.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ projet.code_projet }} - {{ projet.nom_projet|truncatewords:5 }}</span>
+                            <span class="text-danger small">{{ projet.get_pourcentage_budget_consomme|floatformat:1 }}%</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if user.can_validate_expenses and depenses_attente %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-clipboard-check me-2"></i>Dépenses en Attente de Validation
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Projet</th>
+                                <th>Catégorie</th>
+                                <th>Montant</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for depense in depenses_attente %}
+                            <tr>
+                                <td>{{ depense.date_depense|date:"d/m/Y" }}</td>
+                                <td>{{ depense.projet.code_projet }}</td>
+                                <td>{{ depense.categorie.nom }}</td>
+                                <td>{{ depense.montant|floatformat:0|intcomma }} GNF</td>
+                                <td>
+                                    <a href="{% url 'finances:depense_detail' depense.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

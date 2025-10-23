@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Utilisateurs - ETRAGC SARLU{% endblock %}
+{% block page_title %}Gestion des Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-users me-2"></i>Liste des Utilisateurs</span>
+        <a href="{% url 'accounts:user_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nouvel Utilisateur
+        </a>
+    </div>
+    <div class="card-body">
+        {% if users %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_obj in users %}
+                    <tr>
+                        <td>{{ user_obj.get_full_name }}</td>
+                        <td>{{ user_obj.email|default:"-" }}</td>
+                        <td><span class="badge bg-primary">{{ user_obj.get_role_display }}</span></td>
+                        <td>
+                            {% if user_obj.actif %}
+                            <span class="badge bg-success">Actif</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'accounts:user_detail' user_obj.pk %}" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'accounts:user_update' user_obj.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-muted py-4">Aucun utilisateur</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

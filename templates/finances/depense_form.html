@@ -1,0 +1,93 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if object %}Modifier{% else %}Nouvelle{% endif %} Dépense - ETRAGC SARLU{% endblock %}
+{% block page_title %}{% if object %}Modifier{% else %}Nouvelle{% endif %} Dépense{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-receipt me-2"></i>{% if object %}Modifier la dépense{% else %}Enregistrer une dépense{% endif %}
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.projet.id_for_label }}" class="form-label">Projet *</label>
+                            {{ form.projet }}
+                            {% if form.projet.errors %}
+                            <div class="text-danger small">{{ form.projet.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.categorie.id_for_label }}" class="form-label">Catégorie *</label>
+                            {{ form.categorie }}
+                            {% if form.categorie.errors %}
+                            <div class="text-danger small">{{ form.categorie.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.fournisseur.id_for_label }}" class="form-label">Fournisseur</label>
+                        {{ form.fournisseur }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.montant.id_for_label }}" class="form-label">Montant (GNF) *</label>
+                            {{ form.montant }}
+                            {% if form.montant.errors %}
+                            <div class="text-danger small">{{ form.montant.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.date_depense.id_for_label }}" class="form-label">Date *</label>
+                            {{ form.date_depense }}
+                            {% if form.date_depense.errors %}
+                            <div class="text-danger small">{{ form.date_depense.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.mode_paiement.id_for_label }}" class="form-label">Mode de paiement *</label>
+                            {{ form.mode_paiement }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.numero_facture.id_for_label }}" class="form-label">N° Facture</label>
+                            {{ form.numero_facture }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.piece_justificative.id_for_label }}" class="form-label">Pièce justificative</label>
+                        {{ form.piece_justificative }}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'finances:depense_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

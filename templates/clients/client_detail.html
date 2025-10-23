@@ -1,0 +1,77 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ client.nom_complet }} - ETRAGC SARLU{% endblock %}
+{% block page_title %}Détails du Client{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <a href="{% url 'clients:list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour
+        </a>
+        <a href="{% url 'clients:update' client.pk %}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>Modifier
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Nom complet:</strong><br>
+                    {{ client.nom_complet }}
+                </div>
+                
+                {% if client.entreprise %}
+                <div class="mb-3">
+                    <strong>Entreprise:</strong><br>
+                    {{ client.entreprise }}
+                </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <strong>Téléphone:</strong><br>
+                    {{ client.telephone|default:"Non renseigné" }}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Email:</strong><br>
+                    {{ client.email|default:"Non renseigné" }}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Adresse:</strong><br>
+                    {{ client.adresse|default:"Non renseignée" }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Projets</h5>
+            </div>
+            <div class="card-body">
+                {% if projets %}
+                <ul class="list-group">
+                    {% for projet in projets %}
+                    <li class="list-group-item">
+                        <a href="{% url 'projects:detail' projet.pk %}">{{ projet.code_projet }} - {{ projet.nom_projet }}</a>
+                        <span class="badge {{ projet.get_statut_badge_class }} float-end">{{ projet.get_statut_display }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">Aucun projet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

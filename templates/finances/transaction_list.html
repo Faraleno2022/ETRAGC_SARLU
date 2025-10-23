@@ -1,0 +1,113 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Transactions - ETRAGC SARLU{% endblock %}
+{% block page_title %}Gestion des Transactions{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-money-bill-wave me-2"></i>Liste des Transactions</span>
+        <a href="{% url 'finances:transaction_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nouvelle Transaction
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- Search and Filter Form -->
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-4 mb-2">
+                    <select name="type" class="form-select">
+                        <option value="">Tous les types</option>
+                        <option value="Dépôt" {% if request.GET.type == 'Dépôt' %}selected{% endif %}>Dépôt</option>
+                        <option value="Retrait" {% if request.GET.type == 'Retrait' %}selected{% endif %}>Retrait</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <button class="btn btn-outline-secondary w-100" type="submit">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Transactions Table -->
+        {% if transactions %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Projet</th>
+                        <th>Type</th>
+                        <th>Montant</th>
+                        <th>Mode de paiement</th>
+                        <th>Référence</th>
+                        <th>Saisi par</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.date_transaction|date:"d/m/Y" }}</td>
+                        <td><a href="{% url 'projects:detail' transaction.projet.pk %}">{{ transaction.projet.code_projet }}</a></td>
+                        <td>
+                            {% if transaction.type == 'Dépôt' %}
+                            <span class="badge bg-success">{{ transaction.type }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ transaction.type }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">{{ transaction.montant|floatformat:0|intcomma }} GNF</td>
+                        <td>{{ transaction.get_mode_paiement_display }}</td>
+                        <td>{{ transaction.reference|default:"-" }}</td>
+                        <td>{{ transaction.saisi_par.get_full_name }}</td>
+                        <td>
+                            <a href="{% url 'finances:transaction_detail' transaction.pk %}" class="btn btn-sm btn-outline-info" title="Détails">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Précédent</a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Suivant</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-money-bill-wave fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Aucune transaction trouvée</p>
+            <a href="{% url 'finances:transaction_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Créer la première transaction
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

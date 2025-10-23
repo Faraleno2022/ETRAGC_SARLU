@@ -1,0 +1,174 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Personnel - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h2 class="mb-4"><i class="fas fa-user-hard-hat me-2"></i>Gestion du Personnel</h2>
+    
+    <!-- Statistiques -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Personnel</p>
+                            <h3 class="mb-0">{{ stats.total_personnel }}</h3>
+                        </div>
+                        <i class="fas fa-users fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Personnel Actif</p>
+                            <h3 class="mb-0">{{ stats.personnel_actif }}</h3>
+                        </div>
+                        <i class="fas fa-user-check fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Personnel Inactif</p>
+                            <h3 class="mb-0">{{ stats.personnel_inactif }}</h3>
+                        </div>
+                        <i class="fas fa-user-times fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Affectations Actives</p>
+                            <h3 class="mb-0">{{ stats.total_affectations }}</h3>
+                        </div>
+                        <i class="fas fa-tasks fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Actions Rapides -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Actions Rapides</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'personnel:employe_create' %}" class="btn btn-primary me-2">
+                        <i class="fas fa-plus me-2"></i>Nouvel Employé
+                    </a>
+                    <a href="{% url 'personnel:affectation_create' %}" class="btn btn-success me-2">
+                        <i class="fas fa-plus me-2"></i>Nouvelle Affectation
+                    </a>
+                    <a href="{% url 'personnel:employe_list' %}" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-list me-2"></i>Tous les Employés
+                    </a>
+                    <a href="{% url 'personnel:affectation_list' %}" class="btn btn-outline-success">
+                        <i class="fas fa-list me-2"></i>Toutes les Affectations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Personnel Récent et Affectations -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Personnel Récent</h5>
+                </div>
+                <div class="card-body">
+                    {% if personnel_recents %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Matricule</th>
+                                    <th>Nom</th>
+                                    <th>Poste</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employe in personnel_recents %}
+                                <tr>
+                                    <td><a href="{% url 'personnel:employe_detail' employe.pk %}">{{ employe.matricule }}</a></td>
+                                    <td>{{ employe.get_full_name }}</td>
+                                    <td>{{ employe.get_poste_display }}</td>
+                                    <td>
+                                        {% if employe.actif %}
+                                        <span class="badge bg-success">Actif</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactif</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">Aucun employé</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Affectations Actives</h5>
+                </div>
+                <div class="card-body">
+                    {% if affectations_actives %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Employé</th>
+                                    <th>Projet</th>
+                                    <th>Fonction</th>
+                                    <th>Début</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for affectation in affectations_actives %}
+                                <tr>
+                                    <td>{{ affectation.personnel.get_full_name }}</td>
+                                    <td>{{ affectation.projet.nom_projet }}</td>
+                                    <td>{{ affectation.fonction }}</td>
+                                    <td>{{ affectation.date_debut|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">Aucune affectation active</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
