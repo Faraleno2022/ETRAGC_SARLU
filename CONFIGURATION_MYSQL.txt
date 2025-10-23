@@ -1,0 +1,228 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    CONFIGURATION MYSQL - ETRAGC SARLU                        ║
+║                          PythonAnywhere Hosting                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📋 VOS PARAMÈTRES MYSQL PYTHONANYWHERE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Hôte de la base de données:
+    ETRAGCSARLU.mysql.pythonanywhere-services.com
+
+Nom d'utilisateur:
+    ETRAGCSARLU
+
+Nom de la base de données:
+    ETRAGCSARLU$par défaut
+
+Port:
+    3306
+
+Mot de passe:
+    [À définir dans l'onglet Databases de PythonAnywhere]
+
+⚠️  IMPORTANT:
+    - Le mot de passe MySQL doit être DIFFÉRENT de votre mot de passe PythonAnywhere
+    - Avec un compte gratuit, vous ne pouvez vous connecter à MySQL que depuis 
+      le code exécuté sur PythonAnywhere (pas d'accès externe)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ CONFIGURATION RAPIDE DU FICHIER .env
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Copiez ces lignes dans votre fichier .env sur PythonAnywhere:
+
+# Base de données MySQL PythonAnywhere
+DB_ENGINE=django.db.backends.mysql
+DB_NAME=ETRAGCSARLU$par défaut
+DB_USER=ETRAGCSARLU
+DB_PASSWORD=VOTRE_MOT_DE_PASSE_MYSQL
+DB_HOST=ETRAGCSARLU.mysql.pythonanywhere-services.com
+DB_PORT=3306
+
+# Configuration Django
+SECRET_KEY=changez-cette-cle-par-une-longue-chaine-aleatoire-unique
+DEBUG=False
+ALLOWED_HOSTS=ETRAGCSARLU.pythonanywhere.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 ÉTAPES DE DÉPLOIEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. DÉFINIR LE MOT DE PASSE MYSQL
+   ────────────────────────────────
+   → Allez sur PythonAnywhere > Onglet "Databases"
+   → Section "MySQL password"
+   → Entrez un nouveau mot de passe sécurisé
+   → Cliquez sur "Set MySQL password"
+   → NOTEZ CE MOT DE PASSE
+
+2. CRÉER LA BASE DE DONNÉES
+   ─────────────────────────
+   → Dans l'onglet "Databases"
+   → Section "Create database"
+   → Nom: par défaut
+   → Cliquez sur "Create"
+   → La base "ETRAGCSARLU$par défaut" sera créée
+
+3. UPLOADER VOTRE CODE
+   ───────────────────
+   → Via Git: git clone votre-repo
+   → Ou via l'onglet "Files" pour uploader les fichiers
+
+4. CRÉER LE FICHIER .env
+   ─────────────────────
+   → Console Bash: cd ~/ETRAGC_SARLU
+   → nano .env
+   → Copiez la configuration ci-dessus
+   → Remplacez VOTRE_MOT_DE_PASSE_MYSQL par votre mot de passe
+   → Ctrl+X, Y, Enter pour sauvegarder
+
+5. INSTALLER LES DÉPENDANCES
+   ─────────────────────────
+   pip install --user -r requirements.txt
+
+6. INITIALISER LA BASE DE DONNÉES
+   ──────────────────────────────
+   python manage.py migrate
+   python manage.py createsuperuser
+   python manage.py collectstatic --noinput
+
+7. CONFIGURER LA WEB APP
+   ─────────────────────
+   → Onglet "Web" > "Add a new web app"
+   → Manual configuration > Python 3.10
+   → Modifier le fichier WSGI (voir PYTHONANYWHERE_QUICK_START.md)
+   → Configurer Static files:
+     /static/ → /home/ETRAGCSARLU/ETRAGC_SARLU/staticfiles
+     /media/  → /home/ETRAGCSARLU/ETRAGC_SARLU/media
+
+8. RECHARGER L'APPLICATION
+   ──────────────────────
+   → Cliquez sur le bouton vert "Reload"
+   → Visitez: https://ETRAGCSARLU.pythonanywhere.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 COMMANDES UTILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Vérifier la configuration:
+    python check_mysql_config.py
+
+Tester la connexion MySQL:
+    python manage.py dbshell
+
+Voir les tables:
+    python manage.py dbshell
+    SHOW TABLES;
+    EXIT;
+
+Créer une sauvegarde:
+    mysqldump -u ETRAGCSARLU -h ETRAGCSARLU.mysql.pythonanywhere-services.com \
+    'ETRAGCSARLU$par défaut' > backup.sql
+
+Appliquer les migrations:
+    python manage.py migrate
+
+Collecter les fichiers statiques:
+    python manage.py collectstatic --noinput
+
+Mettre à jour l'application:
+    git pull
+    python manage.py migrate
+    python manage.py collectstatic --noinput
+    [Puis cliquez sur Reload dans l'onglet Web]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  PROBLÈMES COURANTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ "Can't connect to MySQL server"
+   ✓ Vérifiez le hostname dans .env
+   ✓ Vérifiez que vous êtes bien sur PythonAnywhere
+   ✓ Compte gratuit = connexion uniquement depuis PythonAnywhere
+
+❌ "Access denied for user"
+   ✓ Vérifiez le mot de passe dans .env
+   ✓ Vérifiez le nom d'utilisateur: ETRAGCSARLU
+   ✓ Réinitialisez le mot de passe MySQL si nécessaire
+
+❌ "Unknown database"
+   ✓ Vérifiez le nom: ETRAGCSARLU$par défaut (avec le $)
+   ✓ Créez la base dans l'onglet Databases
+
+❌ "No module named 'MySQLdb'"
+   ✓ pip install --user mysqlclient
+   ✓ Ou: pip install --user pymysql
+
+❌ "DisallowedHost"
+   ✓ Ajoutez dans .env: ALLOWED_HOSTS=ETRAGCSARLU.pythonanywhere.com
+
+❌ Les fichiers statiques ne chargent pas
+   ✓ python manage.py collectstatic --noinput
+   ✓ Vérifiez la config Static files dans l'onglet Web
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Guide rapide:
+    PYTHONANYWHERE_QUICK_START.md
+
+Guide complet:
+    PYTHONANYWHERE_SETUP.md
+
+Configuration MySQL générale:
+    MYSQL_SETUP.md
+
+Documentation PythonAnywhere:
+    https://help.pythonanywhere.com/
+
+Documentation Django:
+    https://docs.djangoproject.com/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 CONSEILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Utilisez un mot de passe MySQL fort et unique
+✓ Ne commitez JAMAIS le fichier .env dans Git
+✓ Faites des sauvegardes régulières de la base de données
+✓ Consultez les logs d'erreur dans l'onglet Web
+✓ Testez en local avant de déployer
+✓ Utilisez DEBUG=False en production
+✓ Mettez à jour régulièrement les dépendances
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 CHECKLIST DE DÉPLOIEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] Compte PythonAnywhere créé
+[ ] Mot de passe MySQL défini
+[ ] Base de données créée (ETRAGCSARLU$par défaut)
+[ ] Code uploadé sur PythonAnywhere
+[ ] Fichier .env créé et configuré
+[ ] Dépendances installées (pip install -r requirements.txt)
+[ ] Migrations appliquées (python manage.py migrate)
+[ ] Superutilisateur créé (python manage.py createsuperuser)
+[ ] Fichiers statiques collectés (python manage.py collectstatic)
+[ ] Web App configurée
+[ ] Fichier WSGI configuré
+[ ] Static files configurés (/static/ et /media/)
+[ ] Application rechargée (bouton Reload)
+[ ] Site accessible: https://ETRAGCSARLU.pythonanywhere.com
+[ ] Connexion admin fonctionnelle
+[ ] Toutes les fonctionnalités testées
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Bon déploiement ! 🚀
+
+Pour toute question, consultez la documentation ou les logs d'erreur.
