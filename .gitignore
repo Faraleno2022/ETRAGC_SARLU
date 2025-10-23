@@ -28,7 +28,7 @@ db.sqlite3
 db.sqlite3-journal
 /media
 /staticfiles
-/static
+# Note: /static est maintenant tracké pour inclure les images et fichiers CSS/JS
 
 # Security & Logs
 logs/*.log
