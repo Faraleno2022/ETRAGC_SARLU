@@ -207,7 +207,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # Authentication
 LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'dashboard:home'
+LOGIN_REDIRECT_URL = 'core:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Crispy Forms

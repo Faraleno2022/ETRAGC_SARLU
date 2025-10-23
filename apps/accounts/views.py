@@ -14,7 +14,7 @@ User = get_user_model()
 def login_view(request):
     """Vue de connexion"""
     if request.user.is_authenticated:
-        return redirect('dashboard:home')
+        return redirect('core:home')
     
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, data=request.POST)
@@ -28,7 +28,7 @@ def login_view(request):
                     user.derniere_connexion = timezone.now()
                     user.save(update_fields=['derniere_connexion'])
                     messages.success(request, f'Bienvenue {user.get_full_name()}!')
-                    return redirect('dashboard:home')
+                    return redirect('core:home')
                 else:
                     messages.error(request, 'Votre compte est désactivé.')
             else:
