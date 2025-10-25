@@ -168,8 +168,9 @@ class Projet(models.Model):
     
     def get_pourcentage_budget_consomme(self):
         """Retourne le pourcentage du budget consommé"""
+        from decimal import Decimal
         if self.montant_prevu > 0:
-            return (self.get_total_depenses() / float(self.montant_prevu)) * 100
+            return float((self.get_total_depenses() / self.montant_prevu) * Decimal('100'))
         return 0
     
     def is_budget_depasse(self):

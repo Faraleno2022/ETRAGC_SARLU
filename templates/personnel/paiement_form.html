@@ -1,0 +1,128 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Nouveau{% endif %} Paiement - ETRAGC SARLU{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Modifier le Paiement{% else %}Nouveau Paiement{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-money-bill-wave me-2"></i>
+                    {% if form.instance.pk %}Modifier le Paiement{% else %}Nouveau Paiement{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.personnel.id_for_label }}" class="form-label">Personnel *</label>
+                            {{ form.personnel }}
+                            {% if form.personnel.errors %}
+                            <div class="text-danger">{{ form.personnel.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.projet.id_for_label }}" class="form-label">Projet *</label>
+                            {{ form.projet }}
+                            {% if form.projet.errors %}
+                            <div class="text-danger">{{ form.projet.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.date_paiement.id_for_label }}" class="form-label">Date de Paiement *</label>
+                            {{ form.date_paiement }}
+                            {% if form.date_paiement.errors %}
+                            <div class="text-danger">{{ form.date_paiement.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.montant.id_for_label }}" class="form-label">Montant (GNF) *</label>
+                            {{ form.montant }}
+                            {% if form.montant.errors %}
+                            <div class="text-danger">{{ form.montant.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.nombre_jours.id_for_label }}" class="form-label">Nombre de Jours</label>
+                            {{ form.nombre_jours }}
+                            <small class="form-text text-muted">Pour les journaliers</small>
+                            {% if form.nombre_jours.errors %}
+                            <div class="text-danger">{{ form.nombre_jours.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.mode_paiement.id_for_label }}" class="form-label">Mode de Paiement *</label>
+                            {{ form.mode_paiement }}
+                            {% if form.mode_paiement.errors %}
+                            <div class="text-danger">{{ form.mode_paiement.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.statut.id_for_label }}" class="form-label">Statut *</label>
+                            {{ form.statut }}
+                            {% if form.statut.errors %}
+                            <div class="text-danger">{{ form.statut.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.piece_justificative.id_for_label }}" class="form-label">Pièce Justificative</label>
+                        {{ form.piece_justificative }}
+                        <small class="form-text text-muted">Reçu, bordereau, etc.</small>
+                        {% if form.piece_justificative.errors %}
+                        <div class="text-danger">{{ form.piece_justificative.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'personnel:paiement_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Pré-sélectionner le personnel si passé en paramètre GET
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const personnelId = urlParams.get('personnel');
+    if (personnelId) {
+        const personnelSelect = document.getElementById('{{ form.personnel.id_for_label }}');
+        if (personnelSelect) {
+            personnelSelect.value = personnelId;
+        }
+    }
+});
+</script>
+{% endblock %}

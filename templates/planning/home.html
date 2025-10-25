@@ -1,26 +1,217 @@
 {% extends 'base/base.html' %}
+{% load humanize %}
 
 {% block title %}Planning - ETRAGC SARLU{% endblock %}
-{% block page_title %}Module Planning{% endblock %}
+{% block page_title %}Gestion du Planning{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12 mb-4">
-        <div class="card">
-            <div class="card-body text-center py-5">
-                <i class="fas fa-calendar-alt fa-3x text-primary mb-3"></i>
-                <h5>Planning des Travaux</h5>
-                <p class="text-muted">Gérer le planning et les tâches des projets</p>
-                <a href="{% url 'planning:tache_list' %}" class="btn btn-primary">
-                    <i class="fas fa-list me-2"></i>Voir les tâches
-                </a>
+<div class="container-fluid py-4">
+    <h2 class="mb-4"><i class="fas fa-calendar-alt me-2"></i>Gestion du Planning</h2>
+    
+    <!-- Statistiques -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Tâches</p>
+                            <h3 class="mb-0">{{ stats.total_taches }}</h3>
+                        </div>
+                        <i class="fas fa-tasks fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="border-left-color: #6c757d;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">À Faire</p>
+                            <h3 class="mb-0">{{ stats.taches_a_faire }}</h3>
+                        </div>
+                        <i class="fas fa-clipboard-list fa-2x text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="border-left-color: #0d6efd;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">En Cours</p>
+                            <h3 class="mb-0">{{ stats.taches_en_cours }}</h3>
+                        </div>
+                        <i class="fas fa-spinner fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Terminées</p>
+                            <h3 class="mb-0">{{ stats.taches_terminees }}</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-<div class="alert alert-info">
-    <i class="fas fa-info-circle me-2"></i>
-    <strong>Module en développement:</strong> Les fonctionnalités de planning seront disponibles prochainement.
+    
+    <!-- Alerte tâches en retard -->
+    {% if stats.taches_en_retard > 0 %}
+    <div class="alert alert-danger mb-4">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Attention!</strong> {{ stats.taches_en_retard }} tâche{{ stats.taches_en_retard|pluralize }} en retard.
+        <a href="{% url 'planning:tache_list' %}?retard=1" class="alert-link">Voir les tâches en retard</a>
+    </div>
+    {% endif %}
+    
+    <!-- Actions Rapides -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Actions Rapides</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <a href="{% url 'planning:tache_create' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-plus me-2"></i>Nouvelle Tâche
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'planning:tache_list' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-list me-2"></i>Toutes les Tâches
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'planning:tache_list' %}?statut=En_cours" class="btn btn-outline-info w-100">
+                                <i class="fas fa-spinner me-2"></i>Tâches en Cours
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'planning:tache_list' %}?priorite=Critique" class="btn btn-outline-danger w-100">
+                                <i class="fas fa-exclamation-circle me-2"></i>Tâches Critiques
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tâches Récentes et Urgentes -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Tâches Récentes</h5>
+                </div>
+                <div class="card-body">
+                    {% if taches_recentes %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tâche</th>
+                                    <th>Projet</th>
+                                    <th>Statut</th>
+                                    <th>Priorité</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tache in taches_recentes %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'planning:tache_detail' tache.pk %}">
+                                            {{ tache.nom_tache|truncatewords:5 }}
+                                        </a>
+                                    </td>
+                                    <td><small>{{ tache.projet.code_projet }}</small></td>
+                                    <td>
+                                        <span class="badge {{ tache.get_statut_badge_class }}">
+                                            {{ tache.get_statut_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ tache.get_priorite_badge_class }}">
+                                            {{ tache.get_priorite_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">Aucune tâche récente</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Tâches Critiques</h5>
+                </div>
+                <div class="card-body">
+                    {% if taches_urgentes %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tâche</th>
+                                    <th>Projet</th>
+                                    <th>Échéance</th>
+                                    <th>Responsable</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tache in taches_urgentes %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'planning:tache_detail' tache.pk %}">
+                                            {{ tache.nom_tache|truncatewords:5 }}
+                                        </a>
+                                    </td>
+                                    <td><small>{{ tache.projet.code_projet }}</small></td>
+                                    <td>
+                                        <small class="{% if tache.is_en_retard %}text-danger{% endif %}">
+                                            {{ tache.date_fin_prevue|date:"d/m/Y" }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <small>
+                                            {% if tache.responsable %}
+                                            {{ tache.responsable.get_full_name }}
+                                            {% else %}
+                                            <span class="text-muted">Non assigné</span>
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">Aucune tâche critique</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

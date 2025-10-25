@@ -102,11 +102,11 @@
         
         .top-navbar .nav-link {
             color: rgba(255, 255, 255, 0.9);
-            padding: 0.5rem 0.75rem;
+            padding: 0.4rem 0.6rem;
             margin: 0 0.1rem;
             border-radius: 0.5rem;
             transition: all 0.3s;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
         
         .top-navbar .nav-link:hover,
@@ -237,10 +237,26 @@
                             <i class="fas fa-file-invoice"></i> Facturation
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.app_name == 'personnel' %}active{% endif %}" href="{% url 'personnel:home' %}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'personnel' %}active{% endif %}" href="#" id="personnelDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-user-hard-hat"></i> Personnel
                         </a>
+                        <ul class="dropdown-menu" aria-labelledby="personnelDropdown">
+                            <li><a class="dropdown-item" href="{% url 'personnel:home' %}"><i class="fas fa-home me-2"></i>Accueil Personnel</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header"><i class="fas fa-users me-2"></i>Employés</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'personnel:employe_list' %}"><i class="fas fa-list me-2"></i>Liste des Employés</a></li>
+                            <li><a class="dropdown-item" href="{% url 'personnel:create' %}"><i class="fas fa-user-plus me-2"></i>Nouvel Employé</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header"><i class="fas fa-tasks me-2"></i>Affectations</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'personnel:affectation_list' %}"><i class="fas fa-list me-2"></i>Liste des Affectations</a></li>
+                            <li><a class="dropdown-item" href="{% url 'personnel:affectation_create' %}"><i class="fas fa-user-tag me-2"></i>Nouvelle Affectation</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header"><i class="fas fa-money-bill-wave me-2"></i>Paiements</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'personnel:paiement_list' %}"><i class="fas fa-file-invoice-dollar me-2"></i>Liste des Paiements</a></li>
+                            <li><a class="dropdown-item" href="{% url 'personnel:paiement_create' %}"><i class="fas fa-plus-circle me-2"></i>Nouveau Paiement</a></li>
+                            <li><a class="dropdown-item" href="{% url 'personnel:paiement_list' %}?statut=En_attente"><i class="fas fa-clock me-2 text-warning"></i>Paiements en Attente</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.app_name == 'planning' %}active{% endif %}" href="{% url 'planning:home' %}">

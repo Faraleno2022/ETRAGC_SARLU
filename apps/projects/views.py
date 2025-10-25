@@ -48,6 +48,9 @@ class ProjetDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'projet'
     
     def get_context_data(self, **kwargs):
+        from django.db.models import Sum, Count
+        from django.db.models.functions import TruncDate
+        
         context = super().get_context_data(**kwargs)
         projet = self.object
         
@@ -60,7 +63,32 @@ class ProjetDetailView(LoginRequiredMixin, DetailView):
         
         # Transactions et dépenses récentes
         context['transactions_recentes'] = projet.transactions.all()[:10]
-        context['depenses_recentes'] = projet.depenses.all()[:10]
+        context['depenses_recentes'] = projet.depenses.filter(statut='Validée').select_related('categorie', 'fournisseur')[:10]
+        
+        # Dépenses groupées par date
+        context['depenses_par_date'] = projet.depenses.filter(
+            statut='Validée'
+        ).values('date_depense').annotate(
+            total=Sum('montant'),
+            nombre=Count('id')
+        ).order_by('-date_depense')[:20]
+        
+        # Factures du projet
+        context['factures'] = projet.factures.select_related('client', 'devis').order_by('-date_emission')[:10]
+        context['total_factures'] = projet.factures.aggregate(total=Sum('montant_ht'))['total'] or 0
+        
+        # Paiements du personnel
+        context['paiements_personnel'] = projet.paiements_personnel.filter(
+            statut='Validé'
+        ).select_related('personnel', 'saisi_par').order_by('-date_paiement')[:10]
+        context['total_paiements_personnel'] = projet.paiements_personnel.filter(
+            statut='Validé'
+        ).aggregate(total=Sum('montant'))['total'] or 0
+        
+        # Personnel affecté au projet
+        context['personnel_affecte'] = projet.affectations_personnel.filter(
+            date_fin__isnull=True
+        ).select_related('personnel')
         
         return context
 
@@ -97,6 +125,33 @@ class ProjetDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'projects/projet_confirm_delete.html'
     success_url = reverse_lazy('projects:list')
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        projet = self.object
+        
+        # Compter les éléments liés qui seront supprimés
+        context['nb_taches'] = projet.taches.count()
+        context['nb_transactions'] = projet.transactions.count()
+        context['nb_depenses'] = projet.depenses.count()
+        context['nb_factures'] = projet.factures.count()
+        context['nb_devis'] = projet.devis.count()
+        context['nb_affectations'] = projet.affectations_personnel.count()
+        context['nb_paiements_personnel'] = projet.paiements_personnel.count()
+        
+        # Total des éléments
+        context['total_elements'] = (
+            context['nb_taches'] + 
+            context['nb_transactions'] + 
+            context['nb_depenses'] + 
+            context['nb_factures'] + 
+            context['nb_devis'] + 
+            context['nb_affectations'] + 
+            context['nb_paiements_personnel']
+        )
+        
+        return context
+    
     def delete(self, request, *args, **kwargs):
-        messages.warning(request, 'Projet supprimé.')
+        projet_nom = self.get_object().nom_projet
+        messages.warning(request, f'Projet "{projet_nom}" et toutes ses données associées ont été supprimés.')
         return super().delete(request, *args, **kwargs)

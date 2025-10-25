@@ -1,0 +1,190 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Paiement {{ paiement.personnel.get_full_name }} - ETRAGC SARLU{% endblock %}
+{% block page_title %}Détails du Paiement{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <a href="{% url 'personnel:paiement_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+        {% if paiement.statut == 'En_attente' %}
+        <a href="{% url 'personnel:paiement_update' paiement.pk %}" class="btn btn-warning">
+            <i class="fas fa-edit me-2"></i>Modifier
+        </a>
+        <a href="{% url 'personnel:paiement_valider' paiement.pk %}" class="btn btn-success">
+            <i class="fas fa-check me-2"></i>Valider
+        </a>
+        <a href="{% url 'personnel:paiement_rejeter' paiement.pk %}" class="btn btn-danger">
+            <i class="fas fa-times me-2"></i>Rejeter
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations du Paiement</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Personnel:</strong><br>
+                        <a href="{% url 'personnel:detail' paiement.personnel.pk %}">
+                            <h5>{{ paiement.personnel.get_full_name }}</h5>
+                        </a>
+                        <small class="text-muted">{{ paiement.personnel.get_fonction_display }}</small>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Projet:</strong><br>
+                        <a href="{% url 'projects:detail' paiement.projet.pk %}">
+                            <h5>{{ paiement.projet.code_projet }}</h5>
+                        </a>
+                        <small class="text-muted">{{ paiement.projet.nom_projet }}</small>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Date de Paiement:</strong><br>
+                        {{ paiement.date_paiement|date:"d/m/Y" }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Montant:</strong><br>
+                        <h4 class="text-success">{{ paiement.montant|floatformat:0|intcomma }} GNF</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Nombre de Jours:</strong><br>
+                        {% if paiement.nombre_jours %}
+                        <span class="badge bg-info fs-6">{{ paiement.nombre_jours }} jours</span>
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Mode de Paiement:</strong><br>
+                        <span class="badge bg-secondary">{{ paiement.get_mode_paiement_display }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Statut:</strong><br>
+                        <span class="badge {{ paiement.get_statut_badge_class }} fs-6">
+                            {{ paiement.get_statut_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                {% if paiement.description %}
+                <div class="mb-3">
+                    <strong>Description:</strong><br>
+                    {{ paiement.description }}
+                </div>
+                {% endif %}
+                
+                {% if paiement.piece_justificative %}
+                <div class="mb-3">
+                    <strong>Pièce Justificative:</strong><br>
+                    <a href="{{ paiement.piece_justificative.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-file-download me-2"></i>Télécharger
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Historique</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Créé le:</strong> {{ paiement.date_creation|date:"d/m/Y à H:i" }}<br>
+                    <strong>Saisi par:</strong> {{ paiement.saisi_par.get_full_name }}
+                </div>
+                
+                {% if paiement.date_validation %}
+                <div class="mb-3">
+                    <strong>{% if paiement.statut == 'Validé' %}Validé{% else %}Rejeté{% endif %} le:</strong> 
+                    {{ paiement.date_validation|date:"d/m/Y à H:i" }}<br>
+                    <strong>Par:</strong> {{ paiement.valide_par.get_full_name }}
+                </div>
+                {% endif %}
+                
+                <div>
+                    <strong>Dernière modification:</strong> {{ paiement.date_modification|date:"d/m/Y à H:i" }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-user me-2"></i>Informations Personnel</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Salaire Journalier</small><br>
+                    {% if paiement.personnel.salaire_journalier %}
+                    <strong>{{ paiement.personnel.salaire_journalier|floatformat:0|intcomma }} GNF</strong>
+                    {% else %}
+                    <span class="text-muted">N/A</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Type de Contrat</small><br>
+                    <span class="badge bg-info">{{ paiement.personnel.get_type_contrat_display }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Téléphone</small><br>
+                    {{ paiement.personnel.telephone|default:"N/A" }}
+                </div>
+                
+                <div>
+                    <a href="{% url 'personnel:detail' paiement.personnel.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                        <i class="fas fa-user me-2"></i>Voir la Fiche
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Informations Projet</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Client</small><br>
+                    <strong>{{ paiement.projet.client.nom_complet }}</strong>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Statut du Projet</small><br>
+                    <span class="badge bg-info">{{ paiement.projet.get_statut_display }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Localisation</small><br>
+                    {{ paiement.projet.localisation|default:"N/A" }}
+                </div>
+                
+                <div>
+                    <a href="{% url 'projects:detail' paiement.projet.pk %}" class="btn btn-sm btn-outline-success w-100">
+                        <i class="fas fa-project-diagram me-2"></i>Voir le Projet
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Terminer Affectation - ETRAGC SARLU{% endblock %}
+{% block page_title %}Terminer une Affectation{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Confirmation</h5>
+            </div>
+            <div class="card-body">
+                <p>Êtes-vous sûr de vouloir terminer cette affectation ?</p>
+                
+                <div class="alert alert-info">
+                    <strong>Personnel:</strong> {{ affectation.personnel.get_full_name }}<br>
+                    <strong>Projet:</strong> {{ affectation.projet }}<br>
+                    <strong>Rôle:</strong> {{ affectation.get_role_chantier_display }}<br>
+                    <strong>Date de début:</strong> {{ affectation.date_debut|date:"d/m/Y" }}
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'personnel:affectation_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-stop me-2"></i>Terminer l'Affectation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

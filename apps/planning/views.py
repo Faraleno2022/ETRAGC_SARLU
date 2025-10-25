@@ -70,6 +70,14 @@ class TacheListView(LoginRequiredMixin, ListView):
         if projet:
             queryset = queryset.filter(projet_id=projet)
         
+        # Filtre tâches en retard
+        retard = self.request.GET.get('retard')
+        if retard:
+            queryset = queryset.filter(
+                statut__in=['A_faire', 'En_cours', 'En_pause'],
+                date_fin_prevue__lt=timezone.now().date()
+            )
+        
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -129,3 +137,43 @@ class TacheDeleteView(LoginRequiredMixin, DeleteView):
 
 
 from django.utils import timezone
+
+
+@login_required
+def changer_statut_tache(request, pk, nouveau_statut):
+    """Changer rapidement le statut d'une tâche"""
+    tache = get_object_or_404(Tache, pk=pk)
+    
+    statuts_valides = dict(Tache.STATUT_CHOICES).keys()
+    if nouveau_statut in statuts_valides:
+        tache.statut = nouveau_statut
+        
+        # Si terminée, enregistrer la date de fin réelle
+        if nouveau_statut == 'Terminée' and not tache.date_fin_reelle:
+            tache.date_fin_reelle = timezone.now().date()
+            tache.pourcentage_progression = 100
+        
+        tache.save()
+        messages.success(request, f'Statut de la tâche changé en "{tache.get_statut_display()}"')
+    else:
+        messages.error(request, 'Statut invalide')
+    
+    return redirect('planning:tache_detail', pk=pk)
+
+
+@login_required
+def terminer_tache(request, pk):
+    """Marquer une tâche comme terminée"""
+    return changer_statut_tache(request, pk, 'Terminée')
+
+
+@login_required
+def demarrer_tache(request, pk):
+    """Démarrer une tâche"""
+    return changer_statut_tache(request, pk, 'En_cours')
+
+
+@login_required
+def mettre_en_pause_tache(request, pk):
+    """Mettre une tâche en pause"""
+    return changer_statut_tache(request, pk, 'En_pause')

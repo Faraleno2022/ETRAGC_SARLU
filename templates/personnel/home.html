@@ -65,6 +65,66 @@
         </div>
     </div>
     
+    <!-- Statistiques Paiements -->
+    {% load humanize %}
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card" style="border-left-color: #f59e0b;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Paiements</p>
+                            <h3 class="mb-0">{{ stats.total_paiements }}</h3>
+                        </div>
+                        <i class="fas fa-file-invoice-dollar fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="border-left-color: #ef4444;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">En Attente</p>
+                            <h3 class="mb-0">{{ stats.paiements_en_attente }}</h3>
+                        </div>
+                        <i class="fas fa-clock fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Validés</p>
+                            <h3 class="mb-0">{{ stats.paiements_valides }}</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="border-left-color: #10b981;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Montant Total Payé</p>
+                            <h4 class="mb-0 text-success">{{ stats.montant_total_paye|floatformat:0|intcomma }} GNF</h4>
+                        </div>
+                        <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Actions Rapides -->
     <div class="row mb-4">
         <div class="col-md-12">
@@ -73,26 +133,53 @@
                     <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Actions Rapides</h5>
                 </div>
                 <div class="card-body">
-                    <a href="{% url 'personnel:employe_create' %}" class="btn btn-primary me-2">
-                        <i class="fas fa-plus me-2"></i>Nouvel Employé
-                    </a>
-                    <a href="{% url 'personnel:affectation_create' %}" class="btn btn-success me-2">
-                        <i class="fas fa-plus me-2"></i>Nouvelle Affectation
-                    </a>
-                    <a href="{% url 'personnel:employe_list' %}" class="btn btn-outline-primary me-2">
-                        <i class="fas fa-list me-2"></i>Tous les Employés
-                    </a>
-                    <a href="{% url 'personnel:affectation_list' %}" class="btn btn-outline-success">
-                        <i class="fas fa-list me-2"></i>Toutes les Affectations
-                    </a>
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <a href="{% url 'personnel:create' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-user-plus me-2"></i>Nouvel Employé
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'personnel:affectation_create' %}" class="btn btn-success w-100">
+                                <i class="fas fa-user-tag me-2"></i>Nouvelle Affectation
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'personnel:paiement_create' %}" class="btn btn-warning w-100">
+                                <i class="fas fa-money-bill-wave me-2"></i>Nouveau Paiement
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'personnel:employe_list' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-users me-2"></i>Tous les Employés
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-2">
+                        <div class="col-md-4">
+                            <a href="{% url 'personnel:affectation_list' %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-tasks me-2"></i>Toutes les Affectations
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'personnel:paiement_list' %}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-file-invoice-dollar me-2"></i>Tous les Paiements
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'personnel:paiement_list' %}?statut=En_attente" class="btn btn-outline-danger w-100">
+                                <i class="fas fa-clock me-2"></i>Paiements en Attente
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Personnel Récent et Affectations -->
+    <!-- Personnel Récent, Affectations et Paiements -->
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-users me-2"></i>Personnel Récent</h5>
@@ -100,10 +187,9 @@
                 <div class="card-body">
                     {% if personnel_recents %}
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-sm table-hover">
                             <thead>
                                 <tr>
-                                    <th>Matricule</th>
                                     <th>Nom</th>
                                     <th>Poste</th>
                                     <th>Statut</th>
@@ -112,14 +198,13 @@
                             <tbody>
                                 {% for employe in personnel_recents %}
                                 <tr>
-                                    <td><a href="{% url 'personnel:employe_detail' employe.pk %}">{{ employe.matricule }}</a></td>
-                                    <td>{{ employe.get_full_name }}</td>
-                                    <td>{{ employe.get_poste_display }}</td>
+                                    <td><a href="{% url 'personnel:detail' employe.pk %}">{{ employe.get_full_name }}</a></td>
+                                    <td><small>{{ employe.get_fonction_display }}</small></td>
                                     <td>
                                         {% if employe.actif %}
                                         <span class="badge bg-success">Actif</span>
                                         {% else %}
-                                        <span class="badge bg-danger">Inactif</span>
+                                        <span class="badge bg-secondary">Inactif</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -134,7 +219,7 @@
             </div>
         </div>
         
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Affectations Actives</h5>
@@ -142,22 +227,20 @@
                 <div class="card-body">
                     {% if affectations_actives %}
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-sm table-hover">
                             <thead>
                                 <tr>
                                     <th>Employé</th>
                                     <th>Projet</th>
-                                    <th>Fonction</th>
-                                    <th>Début</th>
+                                    <th>Rôle</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for affectation in affectations_actives %}
                                 <tr>
-                                    <td>{{ affectation.personnel.get_full_name }}</td>
-                                    <td>{{ affectation.projet.nom_projet }}</td>
-                                    <td>{{ affectation.fonction }}</td>
-                                    <td>{{ affectation.date_debut|date:"d/m/Y" }}</td>
+                                    <td><small>{{ affectation.personnel.get_full_name }}</small></td>
+                                    <td><small>{{ affectation.projet.code_projet }}</small></td>
+                                    <td><span class="badge bg-primary">{{ affectation.get_role_chantier_display }}</span></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -165,6 +248,49 @@
                     </div>
                     {% else %}
                     <p class="text-muted text-center py-3">Aucune affectation active</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Paiements Récents</h5>
+                    <a href="{% url 'personnel:paiement_list' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                </div>
+                <div class="card-body">
+                    {% if paiements_recents %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Employé</th>
+                                    <th>Montant</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paiement in paiements_recents %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'personnel:detail' paiement.personnel.pk %}">
+                                            <small>{{ paiement.personnel.get_full_name }}</small>
+                                        </a>
+                                    </td>
+                                    <td><strong>{{ paiement.montant|floatformat:0|intcomma }}</strong> <small>GNF</small></td>
+                                    <td>
+                                        <span class="badge {{ paiement.get_statut_badge_class }}">
+                                            {{ paiement.get_statut_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">Aucun paiement</p>
                     {% endif %}
                 </div>
             </div>

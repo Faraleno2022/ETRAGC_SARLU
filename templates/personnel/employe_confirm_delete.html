@@ -1,0 +1,128 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Supprimer Employé - ETRAGC SARLU{% endblock %}
+{% block page_title %}Confirmation de Suppression{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Supprimer l'Employé
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-circle me-2"></i>Attention!</h5>
+                    <p class="mb-0">
+                        Vous êtes sur le point de supprimer définitivement l'employé 
+                        <strong>"{{ object.get_full_name }}"</strong>.
+                    </p>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">Informations de l'Employé</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Nom complet:</strong></div>
+                            <div class="col-md-8">{{ object.get_full_name }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Fonction:</strong></div>
+                            <div class="col-md-8">{{ object.get_fonction_display }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Type de contrat:</strong></div>
+                            <div class="col-md-8">
+                                <span class="badge bg-info">{{ object.get_type_contrat_display }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Statut:</strong></div>
+                            <div class="col-md-8">
+                                {% if object.actif %}
+                                <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if object.salaire_journalier %}
+                        <div class="row">
+                            <div class="col-md-4"><strong>Salaire journalier:</strong></div>
+                            <div class="col-md-8">{{ object.salaire_journalier|floatformat:0|intcomma }} GNF</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if salaire_du > 0 or total_paiements > 0 %}
+                <div class="card mb-3">
+                    <div class="card-header bg-warning">
+                        <h6 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Informations Financières</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Salaire dû:</strong></div>
+                            <div class="col-md-8 text-primary"><strong>{{ salaire_du|floatformat:0|intcomma }} GNF</strong></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4"><strong>Total paiements reçus:</strong></div>
+                            <div class="col-md-8 text-success"><strong>{{ total_paiements|floatformat:0|intcomma }} GNF</strong></div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if total_elements > 0 %}
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-database me-2"></i>Données Associées qui seront supprimées:</h6>
+                    <ul class="mb-0">
+                        {% if nb_affectations > 0 %}
+                        <li><strong>{{ nb_affectations }}</strong> affectation{{ nb_affectations|pluralize }} à des projets</li>
+                        {% endif %}
+                        {% if nb_paiements > 0 %}
+                        <li><strong>{{ nb_paiements }}</strong> paiement{{ nb_paiements|pluralize }} reçu{{ nb_paiements|pluralize }}</li>
+                        {% endif %}
+                        {% if nb_taches_responsable > 0 %}
+                        <li><strong>{{ nb_taches_responsable }}</strong> tâche{{ nb_taches_responsable|pluralize }} dont il/elle est responsable</li>
+                        {% endif %}
+                    </ul>
+                    <hr>
+                    <p class="mb-0 text-danger">
+                        <strong>Total: {{ total_elements }} élément{{ total_elements|pluralize }} sera{{ total_elements|pluralize:"ont" }} supprimé{{ total_elements|pluralize }}.</strong>
+                    </p>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Cet employé n'a pas de données associées.
+                </div>
+                {% endif %}
+                
+                <div class="alert alert-danger mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Cette action est irréversible!</strong> Toutes les données seront définitivement perdues.
+                </div>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'personnel:detail' object.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Confirmer la Suppression
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Supprimer le Projet - ETRAGC SARLU{% endblock %}
+{% block page_title %}Confirmation de Suppression{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Supprimer le Projet
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-circle me-2"></i>Attention!</h5>
+                    <p class="mb-0">
+                        Vous êtes sur le point de supprimer définitivement le projet 
+                        <strong>"{{ object.nom_projet }}"</strong> ({{ object.code_projet }}).
+                    </p>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">Informations du Projet</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Code:</strong></div>
+                            <div class="col-md-8">{{ object.code_projet }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Nom:</strong></div>
+                            <div class="col-md-8">{{ object.nom_projet }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Client:</strong></div>
+                            <div class="col-md-8">{{ object.client.nom_complet }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Statut:</strong></div>
+                            <div class="col-md-8">
+                                <span class="badge bg-info">{{ object.get_statut_display }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4"><strong>Montant prévu:</strong></div>
+                            <div class="col-md-8">{{ object.montant_prevu|floatformat:0|intcomma }} GNF</div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if total_elements > 0 %}
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-database me-2"></i>Données Associées qui seront supprimées:</h6>
+                    <ul class="mb-0">
+                        {% if nb_taches > 0 %}
+                        <li><strong>{{ nb_taches }}</strong> tâche{{ nb_taches|pluralize }} de planning</li>
+                        {% endif %}
+                        {% if nb_transactions > 0 %}
+                        <li><strong>{{ nb_transactions }}</strong> transaction{{ nb_transactions|pluralize }} financière{{ nb_transactions|pluralize }}</li>
+                        {% endif %}
+                        {% if nb_depenses > 0 %}
+                        <li><strong>{{ nb_depenses }}</strong> dépense{{ nb_depenses|pluralize }}</li>
+                        {% endif %}
+                        {% if nb_factures > 0 %}
+                        <li><strong>{{ nb_factures }}</strong> facture{{ nb_factures|pluralize }}</li>
+                        {% endif %}
+                        {% if nb_devis > 0 %}
+                        <li><strong>{{ nb_devis }}</strong> devi{{ nb_devis|pluralize:"s" }}</li>
+                        {% endif %}
+                        {% if nb_affectations > 0 %}
+                        <li><strong>{{ nb_affectations }}</strong> affectation{{ nb_affectations|pluralize }} de personnel</li>
+                        {% endif %}
+                        {% if nb_paiements_personnel > 0 %}
+                        <li><strong>{{ nb_paiements_personnel }}</strong> paiement{{ nb_paiements_personnel|pluralize }} de personnel</li>
+                        {% endif %}
+                    </ul>
+                    <hr>
+                    <p class="mb-0 text-danger">
+                        <strong>Total: {{ total_elements }} élément{{ total_elements|pluralize }} sera{{ total_elements|pluralize:"ont" }} supprimé{{ total_elements|pluralize }}.</strong>
+                    </p>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Ce projet n'a pas de données associées.
+                </div>
+                {% endif %}
+                
+                <div class="alert alert-danger mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Cette action est irréversible!</strong> Toutes les données seront définitivement perdues.
+                </div>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'projects:detail' object.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Confirmer la Suppression
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

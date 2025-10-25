@@ -1,18 +1,173 @@
 {% extends 'base/base.html' %}
+{% load humanize %}
 
 {% block title %}Factures - ETRAGC SARLU{% endblock %}
 {% block page_title %}Liste des Factures{% endblock %}
 
 {% block content %}
 <div class="card">
-    <div class="card-header">
-        <i class="fas fa-file-invoice-dollar me-2"></i>Liste des Factures
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-file-invoice-dollar me-2"></i>Liste des Factures</span>
+        <div>
+            <div class="btn-group me-2">
+                <a href="{% url 'invoicing:factures_export_excel' %}?{{ request.GET.urlencode }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-file-excel me-1"></i>Excel
+                </a>
+                <a href="{% url 'invoicing:factures_export_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-file-pdf me-1"></i>PDF
+                </a>
+            </div>
+            <a href="{% url 'invoicing:facture_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nouvelle Facture
+            </a>
+        </div>
     </div>
     <div class="card-body">
-        <div class="text-center py-5">
-            <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
-            <p class="text-muted">Module en développement</p>
+        <!-- Recherche et Filtres -->
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Rechercher par N° facture, client, projet..." 
+                           value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-4 mb-2">
+                    <select name="statut" class="form-select">
+                        <option value="">Tous les statuts</option>
+                        <option value="Impayée" {% if request.GET.statut == 'Impayée' %}selected{% endif %}>Impayée</option>
+                        <option value="Partielle" {% if request.GET.statut == 'Partielle' %}selected{% endif %}>Partielle</option>
+                        <option value="Payée" {% if request.GET.statut == 'Payée' %}selected{% endif %}>Payée</option>
+                        <option value="En_retard" {% if request.GET.statut == 'En_retard' %}selected{% endif %}>En retard</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <button class="btn btn-outline-secondary w-100" type="submit">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Table des factures -->
+        {% if factures %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>N° Facture</th>
+                        <th>Date Émission</th>
+                        <th>Client</th>
+                        <th>Projet</th>
+                        <th>Montant HT</th>
+                        <th>Montant TTC</th>
+                        <th>Montant Payé</th>
+                        <th>Reste à Payer</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for facture in factures %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'invoicing:facture_detail' facture.pk %}">
+                                <strong>{{ facture.numero_facture }}</strong>
+                            </a>
+                        </td>
+                        <td>{{ facture.date_emission|date:"d/m/Y" }}</td>
+                        <td>{{ facture.client.nom_complet }}</td>
+                        <td>
+                            {% if facture.projet %}
+                            <a href="{% url 'projects:detail' facture.projet.pk %}">
+                                {{ facture.projet.code_projet }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ facture.montant_ht|floatformat:0|intcomma }} GNF</td>
+                        <td><strong>{{ facture.montant_ttc|floatformat:0|intcomma }} GNF</strong></td>
+                        <td class="text-success">{{ facture.montant_paye|floatformat:0|intcomma }} GNF</td>
+                        <td class="text-danger">
+                            <strong>{{ facture.montant_restant|floatformat:0|intcomma }} GNF</strong>
+                        </td>
+                        <td>
+                            <span class="badge {{ facture.get_statut_badge_class }}">
+                                {{ facture.get_statut_paiement_display }}
+                            </span>
+                            {% if facture.is_en_retard %}
+                            <br><small class="text-danger">{{ facture.get_jours_retard }} jours</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'invoicing:facture_detail' facture.pk %}" 
+                                   class="btn btn-outline-info" title="Détails">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if facture.statut_paiement != 'Payée' %}
+                                <a href="{% url 'invoicing:facture_update' facture.pk %}" 
+                                   class="btn btn-outline-primary" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'invoicing:ajouter_paiement' facture.pk %}" 
+                                   class="btn btn-outline-success" title="Ajouter paiement">
+                                    <i class="fas fa-money-bill"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="4" class="text-end">Totaux:</th>
+                        <th>{{ total_ht|floatformat:0|intcomma }} GNF</th>
+                        <th>{{ total_ttc|floatformat:0|intcomma }} GNF</th>
+                        <th class="text-success">{{ total_paye|floatformat:0|intcomma }} GNF</th>
+                        <th class="text-danger">{{ total_restant|floatformat:0|intcomma }} GNF</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">Première</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">Précédente</a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">Suivante</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">Dernière</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle me-2"></i>
+            Aucune facture trouvée.
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

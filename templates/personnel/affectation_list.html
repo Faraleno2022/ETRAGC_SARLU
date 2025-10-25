@@ -1,0 +1,139 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Affectations - ETRAGC SARLU{% endblock %}
+{% block page_title %}Gestion des Affectations{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-user-tie me-2"></i>Liste des Affectations</span>
+        <a href="{% url 'personnel:affectation_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nouvelle Affectation
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- Filtres -->
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <select name="statut" class="form-select">
+                        <option value="">Toutes les affectations</option>
+                        <option value="actives" {% if request.GET.statut == 'actives' %}selected{% endif %}>Affectations actives</option>
+                        <option value="terminees" {% if request.GET.statut == 'terminees' %}selected{% endif %}>Affectations terminées</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <button class="btn btn-outline-secondary w-100" type="submit">
+                        <i class="fas fa-filter"></i> Filtrer
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Table des affectations -->
+        {% if affectations %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Personnel</th>
+                        <th>Fonction</th>
+                        <th>Projet</th>
+                        <th>Rôle</th>
+                        <th>Date Début</th>
+                        <th>Date Fin</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for affectation in affectations %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'personnel:detail' affectation.personnel.pk %}">
+                                <strong>{{ affectation.personnel.get_full_name }}</strong>
+                            </a>
+                        </td>
+                        <td>{{ affectation.personnel.get_fonction_display }}</td>
+                        <td>
+                            <a href="{% url 'projects:detail' affectation.projet.pk %}">
+                                {{ affectation.projet.code_projet }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ affectation.get_role_chantier_display }}</span>
+                        </td>
+                        <td>{{ affectation.date_debut|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if affectation.date_fin %}
+                            {{ affectation.date_fin|date:"d/m/Y" }}
+                            {% else %}
+                            <span class="text-muted">En cours</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if affectation.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Terminée</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'personnel:affectation_update' affectation.pk %}" 
+                                   class="btn btn-outline-primary" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if not affectation.date_fin %}
+                                <a href="{% url 'personnel:affectation_terminer' affectation.pk %}" 
+                                   class="btn btn-outline-danger" title="Terminer">
+                                    <i class="fas fa-stop"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">Première</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">Précédente</a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">Suivante</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">Dernière</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle me-2"></i>
+            Aucune affectation trouvée.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

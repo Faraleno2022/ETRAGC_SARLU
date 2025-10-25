@@ -1,0 +1,67 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Valider le Paiement - ETRAGC SARLU{% endblock %}
+{% block page_title %}Validation du Paiement{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Valider le Paiement</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Êtes-vous sûr de vouloir valider ce paiement ?
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Personnel:</strong><br>
+                    {{ paiement.personnel.get_full_name }}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Projet:</strong><br>
+                    {{ paiement.projet.code_projet }} - {{ paiement.projet.nom_projet }}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Date de Paiement:</strong><br>
+                    {{ paiement.date_paiement|date:"d/m/Y" }}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Montant:</strong><br>
+                    <h4 class="text-success">{{ paiement.montant|floatformat:0|intcomma }} GNF</h4>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Mode de Paiement:</strong><br>
+                    {{ paiement.get_mode_paiement_display }}
+                </div>
+                
+                {% if paiement.description %}
+                <div class="mb-3">
+                    <strong>Description:</strong><br>
+                    {{ paiement.description }}
+                </div>
+                {% endif %}
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'personnel:paiement_detail' paiement.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>Confirmer la Validation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

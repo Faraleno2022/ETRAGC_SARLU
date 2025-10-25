@@ -1,0 +1,151 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Transaction {{ transaction.reference }} - ETRAGC SARLU{% endblock %}
+{% block page_title %}Détails de la Transaction{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <a href="{% url 'finances:transaction_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations de la Transaction</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Type:</strong><br>
+                        {% if transaction.type == 'Dépôt' %}
+                        <span class="badge bg-success fs-6">{{ transaction.type }}</span>
+                        {% else %}
+                        <span class="badge bg-danger fs-6">{{ transaction.type }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date:</strong><br>
+                        {{ transaction.date_transaction|date:"d/m/Y" }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Projet:</strong><br>
+                        <a href="{% url 'projects:detail' transaction.projet.pk %}">{{ transaction.projet }}</a>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Montant:</strong><br>
+                        <span class="fs-4 {% if transaction.type == 'Dépôt' %}text-success{% else %}text-danger{% endif %}">
+                            {{ transaction.montant|floatformat:0|intcomma }} GNF
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Mode de paiement:</strong><br>
+                        {{ transaction.get_mode_paiement_display }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Référence:</strong><br>
+                        {{ transaction.reference|default:"N/A" }}
+                    </div>
+                </div>
+                
+                {% if transaction.description %}
+                <div class="mb-3">
+                    <strong>Description:</strong><br>
+                    {{ transaction.description }}
+                </div>
+                {% endif %}
+                
+                {% if transaction.piece_justificative %}
+                <div class="mb-3">
+                    <strong>Pièce justificative:</strong><br>
+                    <a href="{{ transaction.piece_justificative.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-file-download me-2"></i>Télécharger
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Saisi par:</strong><br>
+                        {{ transaction.saisi_par.get_full_name|default:transaction.saisi_par.username }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date de création:</strong><br>
+                        {{ transaction.date_creation|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Informations du Projet</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Code Projet</small>
+                    <h6>{{ transaction.projet.code_projet }}</h6>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Nom du Projet</small>
+                    <p class="mb-0">{{ transaction.projet.nom_projet }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Client</small>
+                    <p class="mb-0">{{ transaction.projet.client }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Statut</small><br>
+                    <span class="badge {{ transaction.projet.get_statut_badge_class }}">
+                        {{ transaction.projet.get_statut_display }}
+                    </span>
+                </div>
+                
+                <a href="{% url 'projects:detail' transaction.projet.pk %}" class="btn btn-sm btn-primary w-100">
+                    <i class="fas fa-eye me-2"></i>Voir le projet
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-wallet me-2"></i>Solde du Projet</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Total Dépôts</small>
+                    <h6 class="text-success">{{ transaction.projet.get_total_depots|floatformat:0|intcomma }} GNF</h6>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Total Retraits</small>
+                    <h6 class="text-danger">{{ transaction.projet.get_total_retraits|floatformat:0|intcomma }} GNF</h6>
+                </div>
+                
+                <hr>
+                
+                <div>
+                    <small class="text-muted">Solde Disponible</small>
+                    <h5 class="text-info">{{ transaction.projet.get_solde_disponible|floatformat:0|intcomma }} GNF</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

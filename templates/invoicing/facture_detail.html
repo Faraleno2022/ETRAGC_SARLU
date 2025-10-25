@@ -1,0 +1,278 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Facture {{ facture.numero_facture }} - ETRAGC SARLU{% endblock %}
+{% block page_title %}Détails de la Facture{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <a href="{% url 'invoicing:facture_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+        {% if facture.statut_paiement != 'Payée' %}
+        <a href="{% url 'invoicing:facture_update' facture.pk %}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>Modifier
+        </a>
+        <a href="{% url 'invoicing:ajouter_paiement' facture.pk %}" class="btn btn-success">
+            <i class="fas fa-money-bill me-2"></i>Ajouter un Paiement
+        </a>
+        {% endif %}
+        <a href="{% url 'invoicing:facture_export_detail_pdf' facture.pk %}" class="btn btn-danger">
+            <i class="fas fa-file-pdf me-2"></i>Exporter PDF
+        </a>
+        <button class="btn btn-info" onclick="window.print()">
+            <i class="fas fa-print me-2"></i>Imprimer
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Informations de la facture -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations de la Facture</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>N° Facture:</strong><br>
+                        <h5>{{ facture.numero_facture }}</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Statut:</strong><br>
+                        <span class="badge {{ facture.get_statut_badge_class }} fs-6">
+                            {{ facture.get_statut_paiement_display }}
+                        </span>
+                        {% if facture.is_en_retard %}
+                        <br><span class="badge bg-danger mt-1">En retard de {{ facture.get_jours_retard }} jours</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Date d'émission:</strong><br>
+                        {{ facture.date_emission|date:"d/m/Y" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date d'échéance:</strong><br>
+                        {{ facture.date_echeance|date:"d/m/Y" }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Client:</strong><br>
+                        <a href="{% url 'clients:detail' facture.client.pk %}">{{ facture.client.nom_complet }}</a>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Projet:</strong><br>
+                        {% if facture.projet %}
+                        <a href="{% url 'projects:detail' facture.projet.pk %}">{{ facture.projet }}</a>
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if facture.devis %}
+                <div class="mb-3">
+                    <strong>Devis associé:</strong><br>
+                    <a href="{% url 'invoicing:devis_detail' facture.devis.pk %}">{{ facture.devis.numero_devis }}</a>
+                </div>
+                {% endif %}
+                
+                {% if facture.notes %}
+                <div class="mb-3">
+                    <strong>Notes:</strong><br>
+                    {{ facture.notes }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Lignes de la facture -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Détails de la Facture</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Désignation</th>
+                                <th>Quantité</th>
+                                <th>Unité</th>
+                                <th class="text-end">Prix Unitaire HT</th>
+                                <th class="text-end">Montant HT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ligne in lignes %}
+                            <tr>
+                                <td>
+                                    <strong>{{ ligne.designation }}</strong>
+                                    {% if ligne.description %}
+                                    <br><small class="text-muted">{{ ligne.description }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ligne.quantite }}</td>
+                                <td>{{ ligne.unite }}</td>
+                                <td class="text-end">{{ ligne.prix_unitaire_ht|floatformat:0|intcomma }} GNF</td>
+                                <td class="text-end"><strong>{{ ligne.montant_ht|floatformat:0|intcomma }} GNF</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="4" class="text-end">Total HT:</th>
+                                <th class="text-end">{{ facture.montant_ht|floatformat:0|intcomma }} GNF</th>
+                            </tr>
+                            <tr>
+                                <th colspan="4" class="text-end">TVA ({{ facture.taux_tva }}%):</th>
+                                <th class="text-end">{{ facture.montant_tva|floatformat:0|intcomma }} GNF</th>
+                            </tr>
+                            <tr class="table-primary">
+                                <th colspan="4" class="text-end">Total TTC:</th>
+                                <th class="text-end">{{ facture.montant_ttc|floatformat:0|intcomma }} GNF</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historique des paiements -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Historique des Paiements</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if paiements %}
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Mode de Paiement</th>
+                                <th>Référence</th>
+                                <th>Saisi par</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for paiement in paiements %}
+                            <tr>
+                                <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
+                                <td><strong>{{ paiement.montant|floatformat:0|intcomma }} GNF</strong></td>
+                                <td>{{ paiement.get_mode_paiement_display }}</td>
+                                <td>{{ paiement.reference|default:"-" }}</td>
+                                <td>{{ paiement.saisi_par.get_full_name|default:paiement.saisi_par.username }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th>Total Payé:</th>
+                                <th colspan="4"><strong>{{ facture.montant_paye|floatformat:0|intcomma }} GNF</strong></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted py-3">Aucun paiement enregistré</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Résumé financier -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-calculator me-2"></i>Résumé Financier</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Montant Total TTC</small>
+                    <h4 class="text-primary">{{ facture.montant_ttc|floatformat:0|intcomma }} GNF</h4>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Montant Payé</small>
+                    <h5 class="text-success">{{ facture.montant_paye|floatformat:0|intcomma }} GNF</h5>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Reste à Payer</small>
+                    <h4 class="text-danger">{{ facture.montant_restant|floatformat:0|intcomma }} GNF</h4>
+                </div>
+                
+                <div class="progress" style="height: 25px;">
+                    {% widthratio facture.montant_paye facture.montant_ttc 100 as pourcentage %}
+                    <div class="progress-bar {% if pourcentage == 100 %}bg-success{% elif pourcentage > 0 %}bg-warning{% else %}bg-danger{% endif %}" 
+                         role="progressbar" style="width: {{ pourcentage }}%;">
+                        {{ pourcentage }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informations du client -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-user me-2"></i>Informations Client</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <strong>{{ facture.client.nom_complet }}</strong>
+                </div>
+                {% if facture.client.telephone %}
+                <div class="mb-2">
+                    <i class="fas fa-phone me-2"></i>{{ facture.client.telephone }}
+                </div>
+                {% endif %}
+                {% if facture.client.email %}
+                <div class="mb-2">
+                    <i class="fas fa-envelope me-2"></i>{{ facture.client.email }}
+                </div>
+                {% endif %}
+                {% if facture.client.adresse %}
+                <div class="mb-2">
+                    <i class="fas fa-map-marker-alt me-2"></i>{{ facture.client.adresse }}
+                </div>
+                {% endif %}
+                <a href="{% url 'clients:detail' facture.client.pk %}" class="btn btn-sm btn-outline-primary w-100 mt-2">
+                    <i class="fas fa-eye me-2"></i>Voir le client
+                </a>
+            </div>
+        </div>
+        
+        <!-- Métadonnées -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info me-2"></i>Métadonnées</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">Créée par:</small><br>
+                    {{ facture.cree_par.get_full_name|default:facture.cree_par.username }}
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Date de création:</small><br>
+                    {{ facture.date_creation|date:"d/m/Y H:i" }}
+                </div>
+                <div>
+                    <small class="text-muted">Dernière modification:</small><br>
+                    {{ facture.date_modification|date:"d/m/Y H:i" }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

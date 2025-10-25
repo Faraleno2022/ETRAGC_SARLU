@@ -1,0 +1,195 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Dépense - ETRAGC SARLU{% endblock %}
+{% block page_title %}Détails de la Dépense{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <a href="{% url 'finances:depense_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+        {% if depense.statut == 'En_attente' %}
+        <a href="{% url 'finances:depense_update' depense.pk %}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>Modifier
+        </a>
+        <a href="{% url 'finances:depense_valider' depense.pk %}" class="btn btn-success">
+            <i class="fas fa-check me-2"></i>Valider
+        </a>
+        <a href="{% url 'finances:depense_rejeter' depense.pk %}" class="btn btn-danger">
+            <i class="fas fa-times me-2"></i>Rejeter
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations de la Dépense</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Date de dépense:</strong><br>
+                        {{ depense.date_depense|date:"d/m/Y" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Statut:</strong><br>
+                        <span class="badge {{ depense.get_statut_badge_class }} fs-6">{{ depense.get_statut_display }}</span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Projet:</strong><br>
+                        <a href="{% url 'projects:detail' depense.projet.pk %}">{{ depense.projet }}</a>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Montant:</strong><br>
+                        <span class="fs-4 text-danger">
+                            {{ depense.montant|floatformat:0|intcomma }} GNF
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Catégorie:</strong><br>
+                        <span class="badge" style="background-color: {{ depense.categorie.couleur_hex }};">
+                            {{ depense.categorie.nom }}
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Fournisseur:</strong><br>
+                        {% if depense.fournisseur %}
+                        <a href="{% url 'finances:fournisseur_detail' depense.fournisseur.pk %}">{{ depense.fournisseur }}</a>
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Mode de paiement:</strong><br>
+                        {{ depense.get_mode_paiement_display }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>N° facture:</strong><br>
+                        {{ depense.numero_facture|default:"N/A" }}
+                    </div>
+                </div>
+                
+                {% if depense.description %}
+                <div class="mb-3">
+                    <strong>Description:</strong><br>
+                    {{ depense.description }}
+                </div>
+                {% endif %}
+                
+                {% if depense.piece_justificative %}
+                <div class="mb-3">
+                    <strong>Pièce justificative:</strong><br>
+                    <a href="{{ depense.piece_justificative.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-file-download me-2"></i>Télécharger
+                    </a>
+                </div>
+                {% endif %}
+                
+                <hr>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Saisi par:</strong><br>
+                        {{ depense.saisi_par.get_full_name|default:depense.saisi_par.username }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date de création:</strong><br>
+                        {{ depense.date_creation|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+                
+                {% if depense.statut == 'Validée' %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Validée par:</strong><br>
+                        {{ depense.validee_par.get_full_name|default:depense.validee_par.username }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date de validation:</strong><br>
+                        {{ depense.date_validation|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Informations du Projet</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Code Projet</small>
+                    <h6>{{ depense.projet.code_projet }}</h6>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Nom du Projet</small>
+                    <p class="mb-0">{{ depense.projet.nom_projet }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Client</small>
+                    <p class="mb-0">{{ depense.projet.client }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Statut</small><br>
+                    <span class="badge {{ depense.projet.get_statut_badge_class }}">
+                        {{ depense.projet.get_statut_display }}
+                    </span>
+                </div>
+                
+                <a href="{% url 'projects:detail' depense.projet.pk %}" class="btn btn-sm btn-primary w-100">
+                    <i class="fas fa-eye me-2"></i>Voir le projet
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Budget du Projet</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Budget Prévu</small>
+                    <h6>{{ depense.projet.montant_prevu|floatformat:0|intcomma }} GNF</h6>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Total Dépenses</small>
+                    <h6 class="text-danger">{{ depense.projet.get_total_depenses|floatformat:0|intcomma }} GNF</h6>
+                </div>
+                
+                <hr>
+                
+                <div>
+                    <small class="text-muted">Budget Consommé</small>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar {% if depense.projet.get_pourcentage_budget_consomme > 100 %}bg-danger{% elif depense.projet.get_pourcentage_budget_consomme > 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                             role="progressbar" style="width: {{ depense.projet.get_pourcentage_budget_consomme|floatformat:0 }}%;">
+                            {{ depense.projet.get_pourcentage_budget_consomme|floatformat:1 }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

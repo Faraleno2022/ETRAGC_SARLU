@@ -1,5 +1,5 @@
 from django import forms
-from .models import Personnel, AffectationPersonnel
+from .models import Personnel, AffectationPersonnel, PaiementPersonnel
 
 
 class PersonnelForm(forms.ModelForm):
@@ -41,4 +41,25 @@ class AffectationPersonnelForm(forms.ModelForm):
             'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+
+class PaiementPersonnelForm(forms.ModelForm):
+    """Formulaire pour les paiements du personnel"""
+    class Meta:
+        model = PaiementPersonnel
+        fields = [
+            'personnel', 'projet', 'date_paiement', 'montant', 'nombre_jours',
+            'mode_paiement', 'statut', 'description', 'piece_justificative'
+        ]
+        widgets = {
+            'personnel': forms.Select(attrs={'class': 'form-select'}),
+            'projet': forms.Select(attrs={'class': 'form-select'}),
+            'date_paiement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'montant': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'nombre_jours': forms.NumberInput(attrs={'class': 'form-control'}),
+            'mode_paiement': forms.Select(attrs={'class': 'form-select'}),
+            'statut': forms.Select(attrs={'class': 'form-select'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'piece_justificative': forms.FileInput(attrs={'class': 'form-control'}),
         }

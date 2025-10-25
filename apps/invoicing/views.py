@@ -60,6 +60,14 @@ class DevisListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(statut=statut)
         
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Calculer les totaux pour la page actuelle
+        devis_list = context['devis_list']
+        context['total_ht'] = sum(d.montant_ht for d in devis_list)
+        context['total_ttc'] = sum(d.montant_ttc for d in devis_list)
+        return context
 
 
 class DevisCreateView(LoginRequiredMixin, CreateView):
@@ -169,6 +177,16 @@ class FactureListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(statut_paiement=statut)
         
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Calculer les totaux pour la page actuelle
+        factures = context['factures']
+        context['total_ht'] = sum(f.montant_ht for f in factures)
+        context['total_ttc'] = sum(f.montant_ttc for f in factures)
+        context['total_paye'] = sum(f.montant_paye for f in factures)
+        context['total_restant'] = sum(f.montant_restant for f in factures)
+        return context
 
 
 class FactureCreateView(LoginRequiredMixin, CreateView):

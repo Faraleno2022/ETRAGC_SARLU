@@ -117,12 +117,6 @@ class Devis(models.Model):
             
             self.numero_devis = f'DEV-{year}-{new_number:03d}'
         
-        # Calcul du montant HT à partir des lignes
-        if self.pk:
-            self.montant_ht = self.lignes.aggregate(
-                total=models.Sum('montant_ht')
-            )['total'] or 0
-        
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
@@ -153,6 +147,13 @@ class Devis(models.Model):
             'Expiré': 'bg-warning',
         }
         return statut_classes.get(self.statut, 'bg-secondary')
+    
+    def calculer_montant_total(self):
+        """Recalcule le montant HT à partir des lignes"""
+        if self.pk:
+            total = sum(ligne.montant_ht for ligne in self.lignes.all())
+            self.montant_ht = total
+            self.save()
 
 
 class LigneDevis(models.Model):
@@ -398,6 +399,25 @@ class Facture(models.Model):
             'En_retard': 'bg-danger',
         }
         return statut_classes.get(self.statut_paiement, 'bg-secondary')
+    
+    def calculer_montant_total(self):
+        """Recalcule le montant HT à partir des lignes"""
+        if self.pk:
+            total = sum(ligne.montant_ht for ligne in self.lignes.all())
+            self.montant_ht = total
+            self.save()
+    
+    def mettre_a_jour_statut_paiement(self):
+        """Met à jour le statut de paiement en fonction du montant payé"""
+        if self.montant_paye >= self.montant_ttc:
+            self.statut_paiement = 'Payée'
+        elif self.montant_paye > 0:
+            self.statut_paiement = 'Partielle'
+        elif self.is_en_retard():
+            self.statut_paiement = 'En_retard'
+        else:
+            self.statut_paiement = 'Impayée'
+        self.save()
 
 
 class LigneFacture(models.Model):
