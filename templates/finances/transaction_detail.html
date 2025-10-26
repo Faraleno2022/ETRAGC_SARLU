@@ -10,6 +10,9 @@
         <a href="{% url 'finances:transaction_list' %}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-2"></i>Retour à la liste
         </a>
+        <a href="{% url 'finances:transaction_delete' transaction.pk %}" class="btn btn-outline-danger float-end">
+            <i class="fas fa-trash me-2"></i>Supprimer
+        </a>
     </div>
 </div>
 

@@ -51,6 +51,17 @@ class TransactionDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'transaction'
 
 
+class TransactionDeleteView(LoginRequiredMixin, DeleteView):
+    """Suppression d'une transaction"""
+    model = Transaction
+    template_name = 'finances/transaction_confirm_delete.html'
+    success_url = reverse_lazy('finances:transaction_list')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Transaction supprimée avec succès.')
+        return super().delete(request, *args, **kwargs)
+
+
 # Depense Views
 class DepenseListView(LoginRequiredMixin, ListView):
     model = Depense

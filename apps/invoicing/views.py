@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q, Sum
@@ -151,6 +151,19 @@ class DevisDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
+class DevisDeleteView(LoginRequiredMixin, DeleteView):
+    """Suppression d'un devis"""
+    model = Devis
+    template_name = 'invoicing/devis_confirm_delete.html'
+    success_url = reverse_lazy('invoicing:devis_list')
+    context_object_name = 'devis'
+    
+    def delete(self, request, *args, **kwargs):
+        devis = self.get_object()
+        messages.success(request, f'Devis {devis.numero_devis} supprimé avec succès.')
+        return super().delete(request, *args, **kwargs)
+
+
 # ===== FACTURES =====
 class FactureListView(LoginRequiredMixin, ListView):
     """Liste des factures"""
@@ -269,6 +282,19 @@ class FactureDetailView(LoginRequiredMixin, DetailView):
         context['lignes'] = self.object.lignes.all()
         context['paiements'] = self.object.paiements.all().order_by('-date_paiement')
         return context
+
+
+class FactureDeleteView(LoginRequiredMixin, DeleteView):
+    """Suppression d'une facture"""
+    model = Facture
+    template_name = 'invoicing/facture_confirm_delete.html'
+    success_url = reverse_lazy('invoicing:facture_list')
+    context_object_name = 'facture'
+    
+    def delete(self, request, *args, **kwargs):
+        facture = self.get_object()
+        messages.success(request, f'Facture {facture.numero_facture} supprimée avec succès.')
+        return super().delete(request, *args, **kwargs)
 
 
 @login_required

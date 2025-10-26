@@ -21,6 +21,9 @@
         <button class="btn btn-info" onclick="window.print()">
             <i class="fas fa-print me-2"></i>Imprimer
         </button>
+        <a href="{% url 'invoicing:devis_delete' devis.pk %}" class="btn btn-outline-danger float-end">
+            <i class="fas fa-trash me-2"></i>Supprimer
+        </a>
     </div>
 </div>
 

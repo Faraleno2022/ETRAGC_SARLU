@@ -12,6 +12,7 @@ urlpatterns = [
     path('devis/nouveau/', views.DevisCreateView.as_view(), name='devis_create'),
     path('devis/<int:pk>/', views.DevisDetailView.as_view(), name='devis_detail'),
     path('devis/<int:pk>/modifier/', views.DevisUpdateView.as_view(), name='devis_update'),
+    path('devis/<int:pk>/supprimer/', views.DevisDeleteView.as_view(), name='devis_delete'),
     
     # Exports Devis
     path('devis/export/excel/', exports.export_devis_excel, name='devis_export_excel'),
@@ -23,6 +24,7 @@ urlpatterns = [
     path('factures/nouvelle/', views.FactureCreateView.as_view(), name='facture_create'),
     path('factures/<int:pk>/', views.FactureDetailView.as_view(), name='facture_detail'),
     path('factures/<int:pk>/modifier/', views.FactureUpdateView.as_view(), name='facture_update'),
+    path('factures/<int:pk>/supprimer/', views.FactureDeleteView.as_view(), name='facture_delete'),
     path('factures/<int:pk>/paiement/', views.ajouter_paiement, name='ajouter_paiement'),
     
     # Exports Factures
