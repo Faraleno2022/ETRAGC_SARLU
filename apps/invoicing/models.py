@@ -126,7 +126,7 @@ class Devis(models.Model):
     @property
     def montant_tva(self):
         """Calcule le montant de la TVA"""
-        return self.montant_ht * (self.taux_tva / Decimal('100'))
+        return self.montant_ht * (Decimal(str(self.taux_tva)) / Decimal('100'))
     
     @property
     def montant_ttc(self):
@@ -152,7 +152,7 @@ class Devis(models.Model):
     def calculer_montant_total(self):
         """Recalcule le montant HT à partir des lignes"""
         if self.pk:
-            total = sum(ligne.montant_ht for ligne in self.lignes.all())
+            total = sum((ligne.montant_ht for ligne in self.lignes.all()), Decimal('0'))
             self.montant_ht = total
             self.save()
 
@@ -210,7 +210,7 @@ class LigneDevis(models.Model):
     @property
     def montant_ht(self):
         """Calcule le montant HT de la ligne"""
-        return self.quantite * self.prix_unitaire_ht
+        return Decimal(str(self.quantite)) * Decimal(str(self.prix_unitaire_ht))
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -359,7 +359,7 @@ class Facture(models.Model):
     @property
     def montant_tva(self):
         """Calcule le montant de la TVA"""
-        return self.montant_ht * (self.taux_tva / Decimal('100'))
+        return self.montant_ht * (Decimal(str(self.taux_tva)) / Decimal('100'))
     
     @property
     def montant_ttc(self):
@@ -396,7 +396,7 @@ class Facture(models.Model):
     def calculer_montant_total(self):
         """Recalcule le montant HT à partir des lignes"""
         if self.pk:
-            total = sum(ligne.montant_ht for ligne in self.lignes.all())
+            total = sum((ligne.montant_ht for ligne in self.lignes.all()), Decimal('0'))
             self.montant_ht = total
             self.save()
     
@@ -466,7 +466,7 @@ class LigneFacture(models.Model):
     @property
     def montant_ht(self):
         """Calcule le montant HT de la ligne"""
-        return self.quantite * self.prix_unitaire_ht
+        return Decimal(str(self.quantite)) * Decimal(str(self.prix_unitaire_ht))
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
