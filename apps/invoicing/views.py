@@ -80,17 +80,17 @@ class DevisCreateView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context['lignes'] = LigneDevisFormSet(self.request.POST, instance=self.object)
+            context['formset'] = LigneDevisFormSet(self.request.POST)
         else:
-            context['lignes'] = LigneDevisFormSet(instance=self.object)
+            context['formset'] = LigneDevisFormSet()
         return context
     
     def form_valid(self, form):
         context = self.get_context_data()
-        lignes = context['lignes']
+        lignes = context['formset']
         
         self.object = form.save(commit=False)
-        self.object.saisi_par = self.request.user
+        self.object.cree_par = self.request.user
         
         if lignes.is_valid():
             self.object.save()
@@ -116,14 +116,14 @@ class DevisUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context['lignes'] = LigneDevisFormSet(self.request.POST, instance=self.object)
+            context['formset'] = LigneDevisFormSet(self.request.POST, instance=self.object)
         else:
-            context['lignes'] = LigneDevisFormSet(instance=self.object)
+            context['formset'] = LigneDevisFormSet(instance=self.object)
         return context
     
     def form_valid(self, form):
         context = self.get_context_data()
-        lignes = context['lignes']
+        lignes = context['formset']
         
         if lignes.is_valid():
             self.object = form.save()
@@ -199,17 +199,17 @@ class FactureCreateView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context['lignes'] = LigneFactureFormSet(self.request.POST, instance=self.object)
+            context['formset'] = LigneFactureFormSet(self.request.POST)
         else:
-            context['lignes'] = LigneFactureFormSet(instance=self.object)
+            context['formset'] = LigneFactureFormSet()
         return context
     
     def form_valid(self, form):
         context = self.get_context_data()
-        lignes = context['lignes']
+        lignes = context['formset']
         
         self.object = form.save(commit=False)
-        self.object.saisi_par = self.request.user
+        self.object.cree_par = self.request.user
         
         if lignes.is_valid():
             self.object.save()
@@ -235,14 +235,14 @@ class FactureUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context['lignes'] = LigneFactureFormSet(self.request.POST, instance=self.object)
+            context['formset'] = LigneFactureFormSet(self.request.POST, instance=self.object)
         else:
-            context['lignes'] = LigneFactureFormSet(instance=self.object)
+            context['formset'] = LigneFactureFormSet(instance=self.object)
         return context
     
     def form_valid(self, form):
         context = self.get_context_data()
-        lignes = context['lignes']
+        lignes = context['formset']
         
         if lignes.is_valid():
             self.object = form.save()
@@ -281,7 +281,7 @@ def ajouter_paiement(request, pk):
         if form.is_valid():
             paiement = form.save(commit=False)
             paiement.facture = facture
-            paiement.saisi_par = request.user
+            paiement.enregistre_par = request.user
             paiement.save()
             
             # Mettre à jour le statut de la facture

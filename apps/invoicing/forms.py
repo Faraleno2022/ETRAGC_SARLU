@@ -7,12 +7,13 @@ class DevisForm(forms.ModelForm):
     """Formulaire pour les devis"""
     class Meta:
         model = Devis
-        fields = ['client', 'projet', 'date_emission', 'date_validite', 'conditions_paiement', 'notes']
+        fields = ['client', 'projet', 'date_emission', 'date_validite', 'montant_ht', 'conditions_paiement', 'notes']
         widgets = {
             'client': forms.Select(attrs={'class': 'form-select'}),
             'projet': forms.Select(attrs={'class': 'form-select'}),
             'date_emission': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_validite': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'montant_ht': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'readonly': 'readonly', 'id': 'montant_ht_devis'}),
             'conditions_paiement': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
@@ -45,13 +46,14 @@ class FactureForm(forms.ModelForm):
     """Formulaire pour les factures"""
     class Meta:
         model = Facture
-        fields = ['client', 'projet', 'devis', 'date_emission', 'date_echeance', 'conditions_paiement', 'notes']
+        fields = ['client', 'projet', 'devis', 'date_emission', 'date_echeance', 'montant_ht', 'conditions_paiement', 'notes']
         widgets = {
             'client': forms.Select(attrs={'class': 'form-select'}),
             'projet': forms.Select(attrs={'class': 'form-select'}),
             'devis': forms.Select(attrs={'class': 'form-select'}),
             'date_emission': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_echeance': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'montant_ht': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'readonly': 'readonly', 'id': 'montant_ht_facture'}),
             'conditions_paiement': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }

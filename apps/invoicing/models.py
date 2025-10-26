@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 
 class Devis(models.Model):
@@ -125,7 +126,7 @@ class Devis(models.Model):
     @property
     def montant_tva(self):
         """Calcule le montant de la TVA"""
-        return self.montant_ht * (self.taux_tva / 100)
+        return self.montant_ht * (self.taux_tva / Decimal('100'))
     
     @property
     def montant_ttc(self):
@@ -213,8 +214,6 @@ class LigneDevis(models.Model):
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Mettre à jour le montant HT du devis
-        self.devis.save()
 
 
 class Facture(models.Model):
@@ -342,12 +341,6 @@ class Facture(models.Model):
             
             self.numero_facture = f'FACT-{year}-{new_number:03d}'
         
-        # Calcul du montant HT à partir des lignes
-        if self.pk:
-            self.montant_ht = self.lignes.aggregate(
-                total=models.Sum('montant_ht')
-            )['total'] or 0
-        
         # Mise à jour du statut de paiement
         if self.montant_paye >= self.montant_ttc:
             self.statut_paiement = 'Payée'
@@ -366,7 +359,7 @@ class Facture(models.Model):
     @property
     def montant_tva(self):
         """Calcule le montant de la TVA"""
-        return self.montant_ht * (self.taux_tva / 100)
+        return self.montant_ht * (self.taux_tva / Decimal('100'))
     
     @property
     def montant_ttc(self):
@@ -477,8 +470,6 @@ class LigneFacture(models.Model):
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Mettre à jour le montant HT de la facture
-        self.facture.save()
 
 
 class PaiementFacture(models.Model):
