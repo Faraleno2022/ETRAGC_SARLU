@@ -12,6 +12,10 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Money Input CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/money-input.css' %}">
+    
     <!-- Custom CSS -->
     <style>
         :root {
@@ -366,6 +370,10 @@
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Money Formatter -->
+    {% load static %}
+    <script src="{% static 'js/money-formatter.js' %}"></script>
     
     {% block extra_js %}{% endblock %}
 </body>

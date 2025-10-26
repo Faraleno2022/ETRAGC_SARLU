@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Formatage des Montants</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/money-input.css">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">🧪 Test du Formatage Automatique des Montants</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>Instructions :</strong> Saisissez des montants dans les champs ci-dessous pour voir le formatage automatique en action.
+                        </div>
+
+                        <form>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Montant simple</label>
+                                <input type="text" class="form-control money-input" placeholder="Saisissez un montant">
+                                <small class="text-muted">Exemple : 1000000 → 1 000 000</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Prix unitaire</label>
+                                <input type="text" class="form-control money-input" placeholder="Prix unitaire">
+                                <small class="text-muted">Exemple : 2500000.50 → 2 500 000.50</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Montant avec wrapper GNF</label>
+                                <div class="money-input-wrapper">
+                                    <input type="text" class="form-control money-input" placeholder="Montant en GNF">
+                                </div>
+                                <small class="text-muted">Avec indicateur de devise</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Montant en lecture seule</label>
+                                <input type="text" class="form-control money-input" value="15 000 000" readonly>
+                                <small class="text-muted">Champ calculé automatiquement</small>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="mb-3">Exemples de montants formatés</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Saisie</th>
+                                            <th>Affichage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>1000</code></td>
+                                            <td class="text-end fw-bold">1 000</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>50000</code></td>
+                                            <td class="text-end fw-bold">50 000</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>1000000</code></td>
+                                            <td class="text-end fw-bold">1 000 000</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>2500000.50</code></td>
+                                            <td class="text-end fw-bold">2 500 000.50</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>15000000</code></td>
+                                            <td class="text-end fw-bold">15 000 000</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="alert alert-success mt-4">
+                                <h6 class="alert-heading">✅ Fonctionnalités</h6>
+                                <ul class="mb-0">
+                                    <li>Formatage automatique en temps réel</li>
+                                    <li>Espacement tous les 3 chiffres</li>
+                                    <li>Support des décimales</li>
+                                    <li>Conservation de la position du curseur</li>
+                                    <li>Nettoyage automatique avant soumission</li>
+                                </ul>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow mt-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">📊 Fonctions JavaScript disponibles</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button class="btn btn-primary" onclick="testFormatMoney()">Test formatMoney()</button>
+                            <button class="btn btn-success" onclick="testParseMoney()">Test parseMoney()</button>
+                        </div>
+                        <div id="result" class="alert alert-light">
+                            <strong>Résultat :</strong> Cliquez sur un bouton pour tester
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/money-formatter.js"></script>
+    <script>
+        function testFormatMoney() {
+            const amount = 1234567.89;
+            const formatted = formatMoney(amount, 2);
+            document.getElementById('result').innerHTML = 
+                `<strong>formatMoney(${amount}, 2)</strong> = <span class="text-primary fw-bold">"${formatted}"</span>`;
+        }
+
+        function testParseMoney() {
+            const formatted = "1 234 567.89";
+            const parsed = parseMoney(formatted);
+            document.getElementById('result').innerHTML = 
+                `<strong>parseMoney("${formatted}")</strong> = <span class="text-success fw-bold">${parsed}</span>`;
+        }
+    </script>
+</body>
+</html>

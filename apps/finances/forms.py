@@ -12,7 +12,7 @@ class TransactionForm(forms.ModelForm):
         widgets = {
             'projet': forms.Select(attrs={'class': 'form-select'}),
             'type': forms.Select(attrs={'class': 'form-select'}),
-            'montant': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'montant': forms.TextInput(attrs={'class': 'form-control money-input', 'inputmode': 'decimal'}),
             'date_transaction': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'reference': forms.TextInput(attrs={'class': 'form-control'}),
             'mode_paiement': forms.Select(attrs={'class': 'form-select'}),
@@ -33,7 +33,7 @@ class DepenseForm(forms.ModelForm):
             'categorie': forms.Select(attrs={'class': 'form-select'}),
             'fournisseur': forms.Select(attrs={'class': 'form-select'}),
             'date_depense': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'montant': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'montant': forms.TextInput(attrs={'class': 'form-control money-input', 'inputmode': 'decimal'}),
             'mode_paiement': forms.Select(attrs={'class': 'form-select'}),
             'numero_facture': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),

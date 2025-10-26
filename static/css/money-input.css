@@ -1,0 +1,87 @@
+/**
+ * Styles pour les champs de montants avec formatage automatique
+ */
+
+.money-input {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    text-align: right;
+    letter-spacing: 0.5px;
+    background-color: #f8fafc;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.money-input:focus {
+    background-color: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.money-input::placeholder {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 400;
+    text-align: left;
+}
+
+/* Style pour les champs readonly */
+.money-input[readonly] {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
+    font-weight: 700;
+    cursor: not-allowed;
+}
+
+/* Indicateur visuel pour les montants */
+.money-input-wrapper {
+    position: relative;
+}
+
+.money-input-wrapper::after {
+    content: 'GNF';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 0.875rem;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.money-input-wrapper .money-input {
+    padding-right: 50px;
+}
+
+/* Animation lors de la saisie */
+@keyframes pulse-money {
+    0%, 100% {
+        border-color: #3b82f6;
+    }
+    50% {
+        border-color: #60a5fa;
+    }
+}
+
+.money-input:focus:valid {
+    animation: pulse-money 2s ease-in-out infinite;
+}
+
+/* Style pour les montants négatifs (si applicable) */
+.money-input.negative {
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+/* Style pour les grands montants */
+.money-input.large-amount {
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .money-input {
+        font-size: 0.95rem;
+    }
+}

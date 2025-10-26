@@ -13,7 +13,7 @@ class DevisForm(forms.ModelForm):
             'projet': forms.Select(attrs={'class': 'form-select'}),
             'date_emission': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_validite': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'montant_ht': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'readonly': 'readonly', 'id': 'montant_ht_devis'}),
+            'montant_ht': forms.TextInput(attrs={'class': 'form-control money-input', 'readonly': 'readonly', 'id': 'montant_ht_devis'}),
             'conditions_paiement': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
@@ -27,7 +27,7 @@ class LigneDevisForm(forms.ModelForm):
         widgets = {
             'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Description'}),
             'quantite': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Qté', 'step': '0.01'}),
-            'prix_unitaire_ht': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Prix unitaire', 'step': '0.01'}),
+            'prix_unitaire_ht': forms.TextInput(attrs={'class': 'form-control money-input', 'placeholder': 'Prix unitaire', 'inputmode': 'decimal'}),
         }
 
 
@@ -53,7 +53,7 @@ class FactureForm(forms.ModelForm):
             'devis': forms.Select(attrs={'class': 'form-select'}),
             'date_emission': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_echeance': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'montant_ht': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'readonly': 'readonly', 'id': 'montant_ht_facture'}),
+            'montant_ht': forms.TextInput(attrs={'class': 'form-control money-input', 'readonly': 'readonly', 'id': 'montant_ht_facture'}),
             'conditions_paiement': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
@@ -67,7 +67,7 @@ class LigneFactureForm(forms.ModelForm):
         widgets = {
             'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Description'}),
             'quantite': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Qté', 'step': '0.01'}),
-            'prix_unitaire_ht': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Prix unitaire', 'step': '0.01'}),
+            'prix_unitaire_ht': forms.TextInput(attrs={'class': 'form-control money-input', 'placeholder': 'Prix unitaire', 'inputmode': 'decimal'}),
         }
 
 
@@ -88,7 +88,7 @@ class PaiementFactureForm(forms.ModelForm):
         model = PaiementFacture
         fields = ['montant', 'date_paiement', 'mode_paiement', 'reference', 'notes']
         widgets = {
-            'montant': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'montant': forms.TextInput(attrs={'class': 'form-control money-input', 'inputmode': 'decimal'}),
             'date_paiement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'mode_paiement': forms.Select(attrs={'class': 'form-select'}),
             'reference': forms.TextInput(attrs={'class': 'form-control'}),

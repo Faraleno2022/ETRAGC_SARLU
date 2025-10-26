@@ -14,7 +14,7 @@ class ProjetForm(forms.ModelForm):
             'nom_projet': forms.TextInput(attrs={'class': 'form-control'}),
             'client': forms.Select(attrs={'class': 'form-select'}),
             'responsable': forms.Select(attrs={'class': 'form-select'}),
-            'montant_prevu': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'montant_prevu': forms.TextInput(attrs={'class': 'form-control money-input', 'inputmode': 'decimal'}),
             'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_fin_prevue': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_fin_reelle': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
