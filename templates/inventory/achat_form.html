@@ -273,7 +273,34 @@
             
             container.addEventListener('input', (e) => {
                 if (e.target.matches('.number-input, .money-input')) {
+                    // Bloquer les caractères non numériques
+                    const valeur = e.target.value;
+                    const valeurNettoyee = valeur.replace(/[^\d.\s]/g, '');
+                    
+                    // Limiter à un seul point décimal
+                    const parties = valeurNettoyee.split('.');
+                    if (parties.length > 2) {
+                        e.target.value = parties[0] + '.' + parties.slice(1).join('');
+                    } else {
+                        e.target.value = valeurNettoyee;
+                    }
+                    
                     this.calculerMontantLigne(e.target.closest('.ligne-achat'));
+                }
+            });
+            
+            // Bloquer les touches non numériques
+            container.addEventListener('keypress', (e) => {
+                if (e.target.matches('.number-input, .money-input')) {
+                    const char = String.fromCharCode(e.which || e.keyCode);
+                    // Autoriser uniquement les chiffres, le point et les touches de contrôle
+                    if (!/[\d.]/.test(char) && e.which !== 0 && !e.ctrlKey) {
+                        e.preventDefault();
+                    }
+                    // Empêcher plusieurs points
+                    if (char === '.' && e.target.value.includes('.')) {
+                        e.preventDefault();
+                    }
                 }
             });
             
