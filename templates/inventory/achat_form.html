@@ -194,22 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.value = formatNumber(input.value);
             }
             
-            input.addEventListener('input', function(e) {
-                let value = this.value;
-                let cursorPos = this.selectionStart;
-                let spacesBefore = (value.substring(0, cursorPos).match(/\s/g) || []).length;
-                
-                let cleaned = value.replace(/[^\d.]/g, '');
-                let parts = cleaned.split('.');
-                if (parts.length > 2) {
-                    cleaned = parts[0] + '.' + parts.slice(1).join('');
-                }
-                
-                this.value = cleaned;
-                let newPos = cursorPos - spacesBefore;
-                this.setSelectionRange(newPos, newPos);
-            });
-            
             input.addEventListener('blur', function() {
                 if (this.value) {
                     this.value = formatNumber(this.value);

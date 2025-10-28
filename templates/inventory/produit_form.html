@@ -116,9 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function formatNumber(value) {
         if (!value) return value;
         value = value.toString().replace(/\s/g, '');
-        // Séparer partie entière et décimale
         let parts = value.split('.');
-        // Formater la partie entière
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         return parts.join('.');
     }
@@ -134,31 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (input.value) {
             input.value = formatNumber(input.value);
         }
-        
-        // Nettoyer pendant la saisie (enlever les caractères non autorisés)
-        input.addEventListener('input', function(e) {
-            // Autoriser uniquement les chiffres, le point et les espaces
-            let value = this.value;
-            let cursorPos = this.selectionStart;
-            
-            // Compter les espaces avant le curseur
-            let spacesBefore = (value.substring(0, cursorPos).match(/\s/g) || []).length;
-            
-            // Nettoyer et garder seulement chiffres et point
-            let cleaned = value.replace(/[^\d.]/g, '');
-            
-            // Limiter à un seul point
-            let parts = cleaned.split('.');
-            if (parts.length > 2) {
-                cleaned = parts[0] + '.' + parts.slice(1).join('');
-            }
-            
-            this.value = cleaned;
-            
-            // Ajuster la position du curseur
-            let newPos = cursorPos - spacesBefore;
-            this.setSelectionRange(newPos, newPos);
-        });
         
         // Formater quand l'utilisateur quitte le champ
         input.addEventListener('blur', function() {
