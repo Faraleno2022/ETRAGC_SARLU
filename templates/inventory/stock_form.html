@@ -1,0 +1,134 @@
+{% extends 'base/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-warehouse"></i> {{ title }}
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.projet.label }}</label>
+                            {% render_field form.projet class="form-select" %}
+                            {% if form.projet.errors %}
+                            <div class="text-danger">{{ form.projet.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.produit.label }}</label>
+                            {% render_field form.produit class="form-select" %}
+                            {% if form.produit.errors %}
+                            <div class="text-danger">{{ form.produit.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.quantite_actuelle.label }}</label>
+                            {% render_field form.quantite_actuelle class="form-control number-input" %}
+                            {% if form.quantite_actuelle.errors %}
+                            <div class="text-danger">{{ form.quantite_actuelle.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.emplacement.label }}</label>
+                            {% render_field form.emplacement class="form-control" %}
+                            {% if form.emplacement.errors %}
+                            <div class="text-danger">{{ form.emplacement.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                            <a href="{% url 'inventory:stock_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Formatage des nombres
+    function formatNumber(value) {
+        value = value.replace(/\s/g, '');
+        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+    
+    function cleanNumber(value) {
+        return value.replace(/\s/g, '');
+    }
+    
+    document.querySelectorAll('.number-input').forEach(function(input) {
+        if (input.value) {
+            input.value = formatNumber(input.value);
+        }
+        
+        input.addEventListener('input', function(e) {
+            let cursorPosition = this.selectionStart;
+            let valueBeforeCursor = this.value.substring(0, cursorPosition);
+            
+            let cleanValue = this.value.replace(/[^\d.]/g, '');
+            
+            // Limiter à un seul point décimal
+            let parts = cleanValue.split('.');
+            if (parts.length > 2) {
+                cleanValue = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            parts = cleanValue.split('.');
+            let integerPart = parts[0];
+            let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+            
+            let formattedInteger = formatNumber(integerPart);
+            this.value = formattedInteger + decimalPart;
+            
+            // Calculer la nouvelle position du curseur
+            let cleanBeforeCursor = valueBeforeCursor.replace(/[^\d.]/g, '');
+            let formattedBeforeCursor = formatNumber(cleanBeforeCursor.split('.')[0]);
+            if (cleanBeforeCursor.includes('.')) {
+                formattedBeforeCursor += '.' + cleanBeforeCursor.split('.')[1];
+            }
+            let newCursorPosition = formattedBeforeCursor.length;
+            
+            this.setSelectionRange(newCursorPosition, newCursorPosition);
+        });
+    });
+    
+    // Nettoyer avant soumission
+    document.querySelector('form').addEventListener('submit', function() {
+        document.querySelectorAll('.number-input').forEach(function(input) {
+            input.value = cleanNumber(input.value);
+        });
+    });
+});
+</script>
+{% endblock %}
+

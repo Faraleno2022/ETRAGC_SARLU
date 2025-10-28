@@ -106,11 +106,12 @@
         
         .top-navbar .nav-link {
             color: rgba(255, 255, 255, 0.9);
-            padding: 0.4rem 0.6rem;
-            margin: 0 0.1rem;
+            padding: 0.4rem 0.5rem;
+            margin: 0 0.05rem;
             border-radius: 0.5rem;
             transition: all 0.3s;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
         
         .top-navbar .nav-link:hover,
@@ -120,7 +121,13 @@
         }
         
         .top-navbar .nav-link i {
-            margin-right: 0.4rem;
+            margin-right: 0.3rem;
+            font-size: 0.85rem;
+        }
+        
+        .top-navbar .dropdown-toggle {
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
         
         .user-dropdown .dropdown-toggle {
@@ -234,6 +241,11 @@
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.app_name == 'finances' %}active{% endif %}" href="{% url 'finances:transaction_list' %}">
                             <i class="fas fa-money-bill-wave"></i> Finances
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}" href="{% url 'inventory:dashboard' %}">
+                            <i class="fas fa-boxes"></i> Stock
                         </a>
                     </li>
                     <li class="nav-item">

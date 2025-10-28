@@ -1,0 +1,107 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Alertes de Stock - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-exclamation-triangle text-danger"></i> Alertes de Stock Faible
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:dashboard' %}">Gestion de Stock</a></li>
+                    <li class="breadcrumb-item active">Alertes</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Résumé -->
+    <div class="alert alert-warning mb-4">
+        <h5 class="alert-heading">
+            <i class="fas fa-info-circle"></i> Résumé des alertes
+        </h5>
+        <p class="mb-0">
+            <strong>{{ total_alertes }}</strong> produit(s) en stock faible nécessitant une attention.
+        </p>
+    </div>
+
+    {% if alertes_par_projet %}
+        {% for code_projet, data in alertes_par_projet.items %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-project-diagram"></i> 
+                    {{ data.projet.code_projet }} - {{ data.projet.nom_projet }}
+                    <span class="badge bg-light text-dark float-end">
+                        {{ data.stocks|length }} alerte(s)
+                    </span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produit</th>
+                                <th>Catégorie</th>
+                                <th>Stock actuel</th>
+                                <th>Stock minimum</th>
+                                <th>Écart</th>
+                                <th>Emplacement</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stock in data.stocks %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'inventory:produit_detail' stock.produit.pk %}">
+                                        {{ stock.produit.nom }}
+                                    </a>
+                                </td>
+                                <td>{{ stock.produit.categorie.nom }}</td>
+                                <td class="text-danger fw-bold">
+                                    {{ stock.quantite_actuelle }} {{ stock.produit.unite_mesure.symbole }}
+                                </td>
+                                <td>
+                                    {{ stock.produit.stock_minimum }} {{ stock.produit.unite_mesure.symbole }}
+                                </td>
+                                <td class="text-danger">
+                                    {% widthratio stock.produit.stock_minimum|add:"-"|add:stock.quantite_actuelle 1 1 %} {{ stock.produit.unite_mesure.symbole }}
+                                </td>
+                                <td>{{ stock.emplacement|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'inventory:stock_detail' stock.pk %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> Voir
+                                    </a>
+                                    <a href="{% url 'inventory:achat_create' %}?projet={{ stock.projet.pk }}" class="btn btn-sm btn-success">
+                                        <i class="fas fa-shopping-cart"></i> Commander
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-5 text-center">
+            <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+            <h4>Aucune alerte de stock</h4>
+            <p class="text-muted">Tous les stocks sont au-dessus du seuil minimum.</p>
+            <a href="{% url 'inventory:stock_list' %}" class="btn btn-primary">
+                <i class="fas fa-warehouse"></i> Voir tous les stocks
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

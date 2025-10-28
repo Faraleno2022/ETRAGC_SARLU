@@ -1,0 +1,192 @@
+[
+  {
+    "model": "inventory.unitemessure",
+    "pk": 1,
+    "fields": {
+      "nom": "Kilogramme",
+      "symbole": "kg",
+      "description": "Unité de masse",
+      "actif": true
+    }
+  },
+  {
+    "model": "inventory.unitemessure",
+    "pk": 2,
+    "fields": {
+      "nom": "Mètre",
+      "symbole": "m",
+      "description": "Unité de longueur",
+      "actif": true
+    }
+  },
+  {
+    "model": "inventory.unitemessure",
+    "pk": 3,
+    "fields": {
+      "nom": "Mètre carré",
+      "symbole": "m²",
+      "description": "Unité de surface",
+      "actif": true
+    }
+  },
+  {
+    "model": "inventory.unitemessure",
+    "pk": 4,
+    "fields": {
+      "nom": "Mètre cube",
+      "symbole": "m³",
+      "description": "Unité de volume",
+      "actif": true
+    }
+  },
+  {
+    "model": "inventory.unitemessure",
+    "pk": 5,
+    "fields": {
+      "nom": "Pièce",
+      "symbole": "pce",
+      "description": "Unité de comptage",
+      "actif": true
+    }
+  },
+  {
+    "model": "inventory.unitemessure",
+    "pk": 6,
+    "fields": {
+      "nom": "Litre",
+      "symbole": "L",
+      "description": "Unité de volume liquide",
+      "actif": true
+    }
+  },
+  {
+    "model": "inventory.unitemessure",
+    "pk": 7,
+    "fields": {
+      "nom": "Sac",
+      "symbole": "sac",
+      "description": "Unité de conditionnement",
+      "actif": true
+    }
+  },
+  {
+    "model": "inventory.unitemessure",
+    "pk": 8,
+    "fields": {
+      "nom": "Tonne",
+      "symbole": "t",
+      "description": "Unité de masse (1000 kg)",
+      "actif": true
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 1,
+    "fields": {
+      "nom": "Ciment et Liants",
+      "code": "CIM",
+      "description": "Ciment, chaux, mortier",
+      "actif": true,
+      "ordre_affichage": 1
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 2,
+    "fields": {
+      "nom": "Agrégats",
+      "code": "AGR",
+      "description": "Sable, gravier, pierre",
+      "actif": true,
+      "ordre_affichage": 2
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 3,
+    "fields": {
+      "nom": "Fer et Acier",
+      "code": "FER",
+      "description": "Fers à béton, treillis, profilés",
+      "actif": true,
+      "ordre_affichage": 3
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 4,
+    "fields": {
+      "nom": "Bois",
+      "code": "BOI",
+      "description": "Planches, chevrons, contreplaqué",
+      "actif": true,
+      "ordre_affichage": 4
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 5,
+    "fields": {
+      "nom": "Peinture et Finitions",
+      "code": "PEI",
+      "description": "Peintures, vernis, enduits",
+      "actif": true,
+      "ordre_affichage": 5
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 6,
+    "fields": {
+      "nom": "Plomberie",
+      "code": "PLO",
+      "description": "Tuyaux, raccords, robinetterie",
+      "actif": true,
+      "ordre_affichage": 6
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 7,
+    "fields": {
+      "nom": "Électricité",
+      "code": "ELE",
+      "description": "Câbles, interrupteurs, prises",
+      "actif": true,
+      "ordre_affichage": 7
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 8,
+    "fields": {
+      "nom": "Carrelage et Revêtements",
+      "code": "CAR",
+      "description": "Carreaux, faïence, revêtements",
+      "actif": true,
+      "ordre_affichage": 8
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 9,
+    "fields": {
+      "nom": "Quincaillerie",
+      "code": "QUI",
+      "description": "Clous, vis, serrures, charnières",
+      "actif": true,
+      "ordre_affichage": 9
+    }
+  },
+  {
+    "model": "inventory.categorieproduit",
+    "pk": 10,
+    "fields": {
+      "nom": "Outillage",
+      "code": "OUT",
+      "description": "Outils de construction",
+      "actif": true,
+      "ordre_affichage": 10
+    }
+  }
+]

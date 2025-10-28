@@ -22,6 +22,7 @@ urlpatterns = [
     path('invoicing/', include('apps.invoicing.urls')),
     path('personnel/', include('apps.personnel.urls')),
     path('planning/', include('apps.planning.urls')),
+    path('inventory/', include('apps.inventory.urls')),
 ]
 
 # Serve media files in development

@@ -1,0 +1,189 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Achat {{ achat.numero_achat }} - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-shopping-cart"></i> Achat {{ achat.numero_achat }}
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:dashboard' %}">Gestion de Stock</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:achat_list' %}">Achats</a></li>
+                    <li class="breadcrumb-item active">{{ achat.numero_achat }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mb-3">
+        {% if achat.statut == 'Brouillon' %}
+        <a href="{% url 'inventory:achat_update' achat.pk %}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'inventory:achat_valider' achat.pk %}" class="btn btn-success" onclick="return confirm('Confirmer la validation de cet achat ?')">
+            <i class="fas fa-check"></i> Valider
+        </a>
+        {% elif achat.statut == 'Validé' %}
+        <a href="{% url 'inventory:achat_recevoir' achat.pk %}" class="btn btn-primary" onclick="return confirm('Confirmer la réception de cet achat ? Les stocks seront mis à jour.')">
+            <i class="fas fa-truck"></i> Marquer comme reçu
+        </a>
+        {% endif %}
+        <a href="{% url 'inventory:achat_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Informations générales -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">N° Achat:</th>
+                            <td>{{ achat.numero_achat }}</td>
+                        </tr>
+                        <tr>
+                            <th>Projet:</th>
+                            <td>{{ achat.projet.code_projet }} - {{ achat.projet.nom_projet }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fournisseur:</th>
+                            <td>{{ achat.fournisseur.nom }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date d'achat:</th>
+                            <td>{{ achat.date_achat|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date de réception:</th>
+                            <td>{{ achat.date_reception|date:"d/m/Y"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>N° Facture:</th>
+                            <td>{{ achat.numero_facture|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Mode de paiement:</th>
+                            <td>{{ achat.mode_paiement }}</td>
+                        </tr>
+                        <tr>
+                            <th>Statut:</th>
+                            <td>
+                                <span class="badge {{ achat.get_statut_badge_class }}">
+                                    {{ achat.statut }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Montant total:</th>
+                            <td class="fw-bold fs-5">{{ achat.montant_total|floatformat:0|intcomma }} GNF</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations complémentaires -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Informations complémentaires</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">Saisi par:</th>
+                            <td>{{ achat.saisi_par.get_full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date de création:</th>
+                            <td>{{ achat.date_creation|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% if achat.valide_par %}
+                        <tr>
+                            <th>Validé par:</th>
+                            <td>{{ achat.valide_par.get_full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date de validation:</th>
+                            <td>{{ achat.date_validation|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if achat.notes %}
+                        <tr>
+                            <th>Notes:</th>
+                            <td>{{ achat.notes }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if achat.piece_justificative %}
+                        <tr>
+                            <th>Pièce justificative:</th>
+                            <td>
+                                <a href="{{ achat.piece_justificative.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-file-download"></i> Télécharger
+                                </a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lignes d'achat -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">Détail des produits</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Montant</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ligne in lignes %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'inventory:produit_detail' ligne.produit.pk %}">
+                                    {{ ligne.produit.nom }}
+                                </a>
+                            </td>
+                            <td>{{ ligne.quantite }} {{ ligne.produit.unite_mesure.symbole }}</td>
+                            <td>{{ ligne.prix_unitaire|floatformat:0|intcomma }} GNF</td>
+                            <td class="fw-bold">{{ ligne.montant_ligne|floatformat:0|intcomma }} GNF</td>
+                            <td>{{ ligne.notes|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <th colspan="3" class="text-end">Total:</th>
+                            <th class="fs-5">{{ achat.montant_total|floatformat:0|intcomma }} GNF</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Stock {{ stock.produit.nom }} - {{ stock.projet.code_projet }} - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-warehouse"></i> Stock: {{ stock.produit.nom }}
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:dashboard' %}">Gestion de Stock</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:stock_list' %}">Stocks</a></li>
+                    <li class="breadcrumb-item active">Détail</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mb-3">
+        <a href="{% url 'inventory:mouvement_create' %}?stock={{ stock.pk }}" class="btn btn-primary">
+            <i class="fas fa-exchange-alt"></i> Nouveau mouvement
+        </a>
+        <a href="{% url 'inventory:stock_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Informations du stock -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Informations du stock</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">Produit:</th>
+                            <td>
+                                <a href="{% url 'inventory:produit_detail' stock.produit.pk %}">
+                                    {{ stock.produit.nom }}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Projet:</th>
+                            <td>{{ stock.projet.code_projet }} - {{ stock.projet.nom_projet }}</td>
+                        </tr>
+                        <tr>
+                            <th>Quantité actuelle:</th>
+                            <td class="fw-bold fs-4">
+                                {% if stock.is_stock_faible %}
+                                <span class="text-danger">{{ stock.quantite_actuelle }}</span>
+                                {% else %}
+                                <span class="text-success">{{ stock.quantite_actuelle }}</span>
+                                {% endif %}
+                                {{ stock.produit.unite_mesure.symbole }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Stock minimum:</th>
+                            <td>{{ stock.produit.stock_minimum }} {{ stock.produit.unite_mesure.symbole }}</td>
+                        </tr>
+                        <tr>
+                            <th>Valeur du stock:</th>
+                            <td class="fw-bold">{{ stock.valeur_stock|floatformat:0|intcomma }} GNF</td>
+                        </tr>
+                        <tr>
+                            <th>Emplacement:</th>
+                            <td>{{ stock.emplacement|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dernière entrée:</th>
+                            <td>{{ stock.date_derniere_entree|date:"d/m/Y H:i"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dernière sortie:</th>
+                            <td>{{ stock.date_derniere_sortie|date:"d/m/Y H:i"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Statut:</th>
+                            <td>
+                                {% if stock.is_stock_faible %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation-triangle"></i> Stock faible
+                                </span>
+                                {% else %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> Stock OK
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique ou statistiques -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Statistiques</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6>Résumé des mouvements</h6>
+                        <p class="mb-0">
+                            Total de mouvements: <strong>{{ mouvements|length }}</strong>
+                        </p>
+                    </div>
+                    
+                    {% if stock.is_stock_faible %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Attention!</strong> Le stock est en dessous du seuil minimum.
+                        Il est recommandé de commander ce produit.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historique des mouvements -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">Historique des mouvements</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if mouvements %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Quantité</th>
+                            <th>Avant</th>
+                            <th>Après</th>
+                            <th>Motif</th>
+                            <th>Effectué par</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mouvement in mouvements %}
+                        <tr>
+                            <td>{{ mouvement.date_mouvement|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if mouvement.type_mouvement == 'Entrée' %}
+                                <span class="badge bg-success">{{ mouvement.type_mouvement }}</span>
+                                {% elif mouvement.type_mouvement == 'Sortie' %}
+                                <span class="badge bg-danger">{{ mouvement.type_mouvement }}</span>
+                                {% else %}
+                                <span class="badge bg-warning">{{ mouvement.type_mouvement }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="fw-bold">{{ mouvement.quantite }} {{ stock.produit.unite_mesure.symbole }}</td>
+                            <td>{{ mouvement.quantite_avant }} {{ stock.produit.unite_mesure.symbole }}</td>
+                            <td>{{ mouvement.quantite_apres }} {{ stock.produit.unite_mesure.symbole }}</td>
+                            <td>{{ mouvement.motif|default:"-" }}</td>
+                            <td>{{ mouvement.effectue_par.get_full_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-4 text-center text-muted">
+                <i class="fas fa-exchange-alt fa-3x mb-3"></i>
+                <p>Aucun mouvement enregistré</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

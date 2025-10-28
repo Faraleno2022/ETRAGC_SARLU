@@ -1,0 +1,143 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Achats - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-shopping-cart"></i> Liste des Achats
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:dashboard' %}">Gestion de Stock</a></li>
+                    <li class="breadcrumb-item active">Achats</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mb-3">
+        <a href="{% url 'inventory:achat_create' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Nouvel achat
+        </a>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ search }}">
+                </div>
+                <div class="col-md-2">
+                    {{ filter_form.projet }}
+                </div>
+                <div class="col-md-2">
+                    {{ filter_form.fournisseur }}
+                </div>
+                <div class="col-md-2">
+                    {{ filter_form.statut }}
+                </div>
+                <div class="col-md-2">
+                    {{ filter_form.date_debut }}
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Liste des achats -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            {% if achats %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>N° Achat</th>
+                            <th>Date</th>
+                            <th>Projet</th>
+                            <th>Fournisseur</th>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for achat in achats %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'inventory:achat_detail' achat.pk %}">
+                                    {{ achat.numero_achat }}
+                                </a>
+                            </td>
+                            <td>{{ achat.date_achat|date:"d/m/Y" }}</td>
+                            <td>{{ achat.projet.code_projet }}</td>
+                            <td>{{ achat.fournisseur.nom }}</td>
+                            <td>{{ achat.montant_total|floatformat:0|intcomma }} GNF</td>
+                            <td>
+                                <span class="badge {{ achat.get_statut_badge_class }}">
+                                    {{ achat.statut }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'inventory:achat_detail' achat.pk %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if achat.statut == 'Brouillon' %}
+                                <a href="{% url 'inventory:achat_update' achat.pk %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-5 text-center text-muted">
+                <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                <p>Aucun achat trouvé</p>
+                <a href="{% url 'inventory:achat_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Créer le premier achat
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if achats.has_other_pages %}
+        <div class="card-footer">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if achats.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ achats.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">Page {{ achats.number }} sur {{ achats.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if achats.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ achats.next_page_number }}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

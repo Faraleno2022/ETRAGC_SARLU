@@ -1,0 +1,185 @@
+{% extends 'base/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-exchange-alt"></i> {{ title }}
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.stock.label }}</label>
+                            {% render_field form.stock class="form-select" %}
+                            {% if form.stock.errors %}
+                            <div class="text-danger">{{ form.stock.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Sélectionnez le stock à modifier</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.type_mouvement.label }}</label>
+                            {% render_field form.type_mouvement class="form-select" %}
+                            {% if form.type_mouvement.errors %}
+                            <div class="text-danger">{{ form.type_mouvement.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.quantite.label }}</label>
+                            {% render_field form.quantite class="form-control number-input" %}
+                            {% if form.quantite.errors %}
+                            <div class="text-danger">{{ form.quantite.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3" id="projet-destination-field" style="display: none;">
+                            <label class="form-label">{{ form.projet_destination.label }}</label>
+                            {% render_field form.projet_destination class="form-select" %}
+                            {% if form.projet_destination.errors %}
+                            <div class="text-danger">{{ form.projet_destination.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Obligatoire pour les transferts</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.motif.label }}</label>
+                            {% render_field form.motif class="form-control" rows="3" %}
+                            {% if form.motif.errors %}
+                            <div class="text-danger">{{ form.motif.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                            <a href="{% url 'inventory:mouvement_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Types de mouvements</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6><span class="badge bg-success">Entrée</span></h6>
+                        <small>Ajout de produits au stock (réception, retour, etc.)</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6><span class="badge bg-danger">Sortie</span></h6>
+                        <small>Retrait de produits du stock (utilisation, vente, etc.)</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6><span class="badge bg-warning">Ajustement</span></h6>
+                        <small>Correction du stock (inventaire, erreur, etc.)</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6><span class="badge bg-info">Transfert</span></h6>
+                        <small>Déplacement entre projets</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion du champ projet destination
+    const typeMouvementSelect = document.querySelector('select[name="type_mouvement"]');
+    const projetDestinationField = document.getElementById('projet-destination-field');
+    
+    function toggleProjetDestination() {
+        if (typeMouvementSelect.value === 'Transfert') {
+            projetDestinationField.style.display = 'block';
+        } else {
+            projetDestinationField.style.display = 'none';
+        }
+    }
+    
+    typeMouvementSelect.addEventListener('change', toggleProjetDestination);
+    toggleProjetDestination();
+    
+    // Formatage des nombres
+    function formatNumber(value) {
+        value = value.replace(/\s/g, '');
+        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+    
+    function cleanNumber(value) {
+        return value.replace(/\s/g, '');
+    }
+    
+    document.querySelectorAll('.number-input').forEach(function(input) {
+        if (input.value) {
+            input.value = formatNumber(input.value);
+        }
+        
+        input.addEventListener('input', function(e) {
+            let cursorPosition = this.selectionStart;
+            let valueBeforeCursor = this.value.substring(0, cursorPosition);
+            
+            let cleanValue = this.value.replace(/[^\d.]/g, '');
+            
+            // Limiter à un seul point décimal
+            let parts = cleanValue.split('.');
+            if (parts.length > 2) {
+                cleanValue = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            parts = cleanValue.split('.');
+            let integerPart = parts[0];
+            let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+            
+            let formattedInteger = formatNumber(integerPart);
+            this.value = formattedInteger + decimalPart;
+            
+            // Calculer la nouvelle position du curseur
+            let cleanBeforeCursor = valueBeforeCursor.replace(/[^\d.]/g, '');
+            let formattedBeforeCursor = formatNumber(cleanBeforeCursor.split('.')[0]);
+            if (cleanBeforeCursor.includes('.')) {
+                formattedBeforeCursor += '.' + cleanBeforeCursor.split('.')[1];
+            }
+            let newCursorPosition = formattedBeforeCursor.length;
+            
+            this.setSelectionRange(newCursorPosition, newCursorPosition);
+        });
+    });
+    
+    // Nettoyer avant soumission
+    document.querySelector('form').addEventListener('submit', function() {
+        document.querySelectorAll('.number-input').forEach(function(input) {
+            input.value = cleanNumber(input.value);
+        });
+    });
+});
+</script>
+{% endblock %}

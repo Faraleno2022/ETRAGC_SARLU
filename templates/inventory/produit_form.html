@@ -1,0 +1,185 @@
+{% extends 'base/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-box"></i> {{ title }}
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:dashboard' %}">Gestion de Stock</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:produit_list' %}">Produits</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">{{ form.nom.label }}</label>
+                                {% render_field form.nom class="form-control" %}
+                                {% if form.nom.errors %}
+                                <div class="text-danger">{{ form.nom.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.categorie.label }}</label>
+                                {% render_field form.categorie class="form-select" %}
+                                {% if form.categorie.errors %}
+                                <div class="text-danger">{{ form.categorie.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.unite_mesure.label }}</label>
+                                {% render_field form.unite_mesure class="form-select" %}
+                                {% if form.unite_mesure.errors %}
+                                <div class="text-danger">{{ form.unite_mesure.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.prix_unitaire_moyen.label }}</label>
+                                {% render_field form.prix_unitaire_moyen class="form-control money-input" %}
+                                {% if form.prix_unitaire_moyen.errors %}
+                                <div class="text-danger">{{ form.prix_unitaire_moyen.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.stock_minimum.label }}</label>
+                                {% render_field form.stock_minimum class="form-control number-input" %}
+                                {% if form.stock_minimum.errors %}
+                                <div class="text-danger">{{ form.stock_minimum.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.description.label }}</label>
+                            {% render_field form.description class="form-control" rows="3" %}
+                            {% if form.description.errors %}
+                            <div class="text-danger">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            {% render_field form.actif class="form-check-input" %}
+                            <label class="form-check-label">{{ form.actif.label }}</label>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                            <a href="{% url 'inventory:produit_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fonction pour formater les nombres avec espaces
+    function formatNumber(value) {
+        if (!value) return value;
+        value = value.toString().replace(/\s/g, '');
+        // Séparer partie entière et décimale
+        let parts = value.split('.');
+        // Formater la partie entière
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        return parts.join('.');
+    }
+    
+    // Fonction pour nettoyer le nombre
+    function cleanNumber(value) {
+        return value.replace(/\s/g, '');
+    }
+    
+    // Appliquer le formatage aux champs monétaires
+    document.querySelectorAll('.money-input, .number-input').forEach(function(input) {
+        // Formater la valeur initiale si elle existe
+        if (input.value) {
+            input.value = formatNumber(input.value);
+        }
+        
+        // Nettoyer pendant la saisie (enlever les caractères non autorisés)
+        input.addEventListener('input', function(e) {
+            // Autoriser uniquement les chiffres, le point et les espaces
+            let value = this.value;
+            let cursorPos = this.selectionStart;
+            
+            // Compter les espaces avant le curseur
+            let spacesBefore = (value.substring(0, cursorPos).match(/\s/g) || []).length;
+            
+            // Nettoyer et garder seulement chiffres et point
+            let cleaned = value.replace(/[^\d.]/g, '');
+            
+            // Limiter à un seul point
+            let parts = cleaned.split('.');
+            if (parts.length > 2) {
+                cleaned = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            this.value = cleaned;
+            
+            // Ajuster la position du curseur
+            let newPos = cursorPos - spacesBefore;
+            this.setSelectionRange(newPos, newPos);
+        });
+        
+        // Formater quand l'utilisateur quitte le champ
+        input.addEventListener('blur', function() {
+            if (this.value) {
+                this.value = formatNumber(this.value);
+            }
+        });
+        
+        // Nettoyer quand l'utilisateur entre dans le champ
+        input.addEventListener('focus', function() {
+            this.value = cleanNumber(this.value);
+        });
+        
+        // Nettoyer avant la soumission du formulaire
+        input.form.addEventListener('submit', function(e) {
+            document.querySelectorAll('.money-input, .number-input').forEach(function(inp) {
+                inp.value = cleanNumber(inp.value);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+

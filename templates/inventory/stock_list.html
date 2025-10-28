@@ -1,0 +1,142 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Stocks - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-warehouse"></i> Gestion des Stocks
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:dashboard' %}">Gestion de Stock</a></li>
+                    <li class="breadcrumb-item active">Stocks</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ search }}">
+                </div>
+                <div class="col-md-3">
+                    {{ filter_form.projet }}
+                </div>
+                <div class="col-md-3">
+                    {{ filter_form.categorie }}
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check mt-2">
+                        {{ filter_form.stock_faible }}
+                        <label class="form-check-label">Stock faible</label>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Liste des stocks -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            {% if stocks %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Produit</th>
+                            <th>Projet</th>
+                            <th>Quantité</th>
+                            <th>Valeur</th>
+                            <th>Emplacement</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stock in stocks %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'inventory:produit_detail' stock.produit.pk %}">
+                                    {{ stock.produit.nom }}
+                                </a>
+                            </td>
+                            <td>{{ stock.projet.code_projet }}</td>
+                            <td>
+                                {% if stock.is_stock_faible %}
+                                <span class="text-danger fw-bold">
+                                    {{ stock.quantite_actuelle }} {{ stock.produit.unite_mesure.symbole }}
+                                </span>
+                                {% else %}
+                                {{ stock.quantite_actuelle }} {{ stock.produit.unite_mesure.symbole }}
+                                {% endif %}
+                            </td>
+                            <td>{{ stock.valeur_stock|floatformat:0|intcomma }} GNF</td>
+                            <td>{{ stock.emplacement|default:"-" }}</td>
+                            <td>
+                                {% if stock.is_stock_faible %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation-triangle"></i> Faible
+                                </span>
+                                {% else %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> OK
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'inventory:stock_detail' stock.pk %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-5 text-center text-muted">
+                <i class="fas fa-warehouse fa-3x mb-3"></i>
+                <p>Aucun stock trouvé</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if stocks.has_other_pages %}
+        <div class="card-footer">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if stocks.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ stocks.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">Page {{ stocks.number }} sur {{ stocks.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if stocks.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ stocks.next_page_number }}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
