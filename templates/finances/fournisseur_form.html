@@ -1,0 +1,163 @@
+{% extends 'base/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ form.instance.pk|yesno:"Modifier,Nouveau" }} Fournisseur - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-truck"></i> {{ form.instance.pk|yesno:"Modifier,Nouveau" }} Fournisseur
+            </h1>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Informations générales -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations générales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ form.nom.label }} <span class="text-danger">*</span></label>
+                                {% render_field form.nom class="form-control" placeholder="Nom du fournisseur" %}
+                                {% if form.nom.errors %}
+                                <div class="text-danger small mt-1">{{ form.nom.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ form.contact.label }}</label>
+                                {% render_field form.contact class="form-control" placeholder="Personne de contact" %}
+                                {% if form.contact.errors %}
+                                <div class="text-danger small mt-1">{{ form.contact.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ form.telephone.label }}</label>
+                                {% render_field form.telephone class="form-control" placeholder="+224 XXX XX XX XX" %}
+                                {% if form.telephone.errors %}
+                                <div class="text-danger small mt-1">{{ form.telephone.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ form.email.label }}</label>
+                                {% render_field form.email class="form-control" placeholder="email@example.com" %}
+                                {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ form.type.label }}</label>
+                                {% render_field form.type class="form-select" %}
+                                {% if form.type.errors %}
+                                <div class="text-danger small mt-1">{{ form.type.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ form.nif.label }}</label>
+                                {% render_field form.nif class="form-control" placeholder="Numéro d'Identification Fiscale" %}
+                                {% if form.nif.errors %}
+                                <div class="text-danger small mt-1">{{ form.nif.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adresse -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Adresse</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.adresse.label }}</label>
+                            {% render_field form.adresse class="form-control" rows="2" placeholder="Adresse complète" %}
+                            {% if form.adresse.errors %}
+                            <div class="text-danger small mt-1">{{ form.adresse.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ form.ville.label }}</label>
+                                {% render_field form.ville class="form-control" placeholder="Ville" %}
+                                {% if form.ville.errors %}
+                                <div class="text-danger small mt-1">{{ form.ville.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ form.pays.label }}</label>
+                                {% render_field form.pays class="form-control" placeholder="Pays" %}
+                                {% if form.pays.errors %}
+                                <div class="text-danger small mt-1">{{ form.pays.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="mb-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                    <a href="{% url 'finances:fournisseur_list' %}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>Annuler
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Informations complémentaires -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Informations complémentaires</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.conditions_paiement.label }}</label>
+                            {% render_field form.conditions_paiement class="form-control" rows="3" placeholder="Ex: Paiement à 30 jours" %}
+                            {% if form.conditions_paiement.errors %}
+                            <div class="text-danger small mt-1">{{ form.conditions_paiement.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.notes.label }}</label>
+                            {% render_field form.notes class="form-control" rows="4" placeholder="Notes complémentaires..." %}
+                            {% if form.notes.errors %}
+                            <div class="text-danger small mt-1">{{ form.notes.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-check">
+                            {% render_field form.actif class="form-check-input" %}
+                            <label class="form-check-label fw-bold" for="{{ form.actif.id_for_label }}">
+                                {{ form.actif.label }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

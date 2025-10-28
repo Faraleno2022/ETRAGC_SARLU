@@ -1,0 +1,160 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}{{ fournisseur.nom }} - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-truck"></i> {{ fournisseur.nom }}
+            </h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{% url 'finances:fournisseur_update' fournisseur.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Modifier
+            </a>
+            <a href="{% url 'finances:fournisseur_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Informations générales -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Nom</label>
+                            <p class="fw-bold">{{ fournisseur.nom }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Contact</label>
+                            <p>{{ fournisseur.contact|default:"-" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Téléphone</label>
+                            <p>
+                                {% if fournisseur.telephone %}
+                                <i class="fas fa-phone text-primary me-2"></i>{{ fournisseur.telephone }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Email</label>
+                            <p>
+                                {% if fournisseur.email %}
+                                <i class="fas fa-envelope text-primary me-2"></i>{{ fournisseur.email }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Type</label>
+                            <p>
+                                {% if fournisseur.type == 'Personne_physique' %}
+                                <span class="badge bg-info">Personne physique</span>
+                                {% else %}
+                                <span class="badge bg-primary">Personne morale</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">NIF</label>
+                            <p>{{ fournisseur.nif|default:"-" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adresse -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Adresse</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Adresse complète</label>
+                        <p>{{ fournisseur.adresse|default:"-" }}</p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Ville</label>
+                            <p>{{ fournisseur.ville|default:"-" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Pays</label>
+                            <p>{{ fournisseur.pays|default:"-" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Statut -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-flag me-2"></i>Statut</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Statut</label>
+                        <p>
+                            {% if fournisseur.actif %}
+                            <span class="badge bg-success fs-6">Actif</span>
+                            {% else %}
+                            <span class="badge bg-secondary fs-6">Inactif</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small">Date de création</label>
+                        <p>{{ fournisseur.date_creation|date:"d/m/Y à H:i" }}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="text-muted small">Dernière modification</label>
+                        <p>{{ fournisseur.date_modification|date:"d/m/Y à H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Informations complémentaires -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Informations complémentaires</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Conditions de paiement</label>
+                        <p>{{ fournisseur.conditions_paiement|default:"-" }}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="text-muted small">Notes</label>
+                        <p>{{ fournisseur.notes|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
