@@ -1,0 +1,245 @@
+{% extends 'base/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - ETRAGC SARLU{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-shopping-cart"></i> {{ title }}
+            </h1>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Informations générales -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Informations générales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.projet.label }}</label>
+                                {% render_field form.projet class="form-select" %}
+                                {% if form.projet.errors %}
+                                <div class="text-danger">{{ form.projet.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.fournisseur.label }}</label>
+                                {% render_field form.fournisseur class="form-select" %}
+                                {% if form.fournisseur.errors %}
+                                <div class="text-danger">{{ form.fournisseur.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.date_achat.label }}</label>
+                                {% render_field form.date_achat class="form-control" %}
+                                {% if form.date_achat.errors %}
+                                <div class="text-danger">{{ form.date_achat.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.mode_paiement.label }}</label>
+                                {% render_field form.mode_paiement class="form-select" %}
+                                {% if form.mode_paiement.errors %}
+                                <div class="text-danger">{{ form.mode_paiement.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.numero_facture.label }}</label>
+                                {% render_field form.numero_facture class="form-control" %}
+                                {% if form.numero_facture.errors %}
+                                <div class="text-danger">{{ form.numero_facture.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.piece_justificative.label }}</label>
+                                {% render_field form.piece_justificative class="form-control" %}
+                                {% if form.piece_justificative.errors %}
+                                <div class="text-danger">{{ form.piece_justificative.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.notes.label }}</label>
+                            {% render_field form.notes class="form-control" rows="3" %}
+                            {% if form.notes.errors %}
+                            <div class="text-danger">{{ form.notes.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lignes d'achat -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Produits à acheter</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ formset.management_form }}
+                        
+                        <div id="formset-container">
+                            {% for form in formset %}
+                            <div class="formset-form border p-3 mb-3 rounded">
+                                {{ form.id }}
+                                <div class="row">
+                                    <div class="col-md-5 mb-2">
+                                        <label class="form-label">Produit</label>
+                                        {% render_field form.produit class="form-select" %}
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <label class="form-label">Quantité</label>
+                                        {% render_field form.quantite class="form-control number-input" %}
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label class="form-label">Prix unitaire</label>
+                                        {% render_field form.prix_unitaire class="form-control money-input" %}
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <label class="form-label">Supprimer</label>
+                                        {% render_field form.DELETE class="form-check-input" %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label class="form-label">Notes</label>
+                                        {% render_field form.notes class="form-control" rows="2" %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                    <a href="{% url 'inventory:achat_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">Statut</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.statut.label }}</label>
+                            {% render_field form.statut class="form-select" %}
+                            {% if form.statut.errors %}
+                            <div class="text-danger">{{ form.statut.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <small>
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Brouillon:</strong> Achat en cours de saisie<br>
+                                <strong>Validé:</strong> Achat confirmé, en attente de réception<br>
+                                <strong>Reçu:</strong> Produits reçus, stocks mis à jour
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fonction pour formater les nombres avec espaces
+    function formatNumber(value) {
+        if (!value) return value;
+        value = value.toString().replace(/\s/g, '');
+        let parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        return parts.join('.');
+    }
+    
+    // Fonction pour nettoyer le nombre
+    function cleanNumber(value) {
+        if (!value) return value;
+        return value.toString().replace(/\s/g, '');
+    }
+    
+    // Fonction pour initialiser le formatage sur un input
+    function initFormatting(input) {
+        // Formater la valeur initiale
+        if (input.value) {
+            input.value = formatNumber(input.value);
+        }
+        
+        // Marquer comme initialisé pour éviter les doublons
+        if (input.dataset.formattingInit) return;
+        input.dataset.formattingInit = 'true';
+        
+        // Focus : nettoyer
+        input.addEventListener('focus', function() {
+            this.value = cleanNumber(this.value);
+        });
+        
+        // Blur : formater
+        input.addEventListener('blur', function() {
+            if (this.value) {
+                this.value = formatNumber(this.value);
+            }
+        });
+    }
+    
+    // Initialiser tous les champs existants
+    function initAllInputs() {
+        document.querySelectorAll('.money-input, .number-input').forEach(initFormatting);
+    }
+    
+    // Initialiser au chargement
+    initAllInputs();
+    
+    // Observer pour les nouveaux champs (formsets dynamiques)
+    const observer = new MutationObserver(function(mutations) {
+        initAllInputs();
+    });
+    
+    const formContainer = document.querySelector('form');
+    if (formContainer) {
+        observer.observe(formContainer, {
+            childList: true,
+            subtree: true
+        });
+    }
+    
+    // Nettoyer avant soumission
+    document.querySelector('form').addEventListener('submit', function() {
+        document.querySelectorAll('.money-input, .number-input').forEach(function(input) {
+            input.value = cleanNumber(input.value);
+        });
+    });
+});
+</script>
+{% endblock %}
+

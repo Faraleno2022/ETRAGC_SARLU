@@ -13,155 +13,204 @@
         </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="achat-form">
         {% csrf_token %}
         
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <!-- Informations générales -->
                 <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Informations générales</h5>
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations générales</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.projet.label }}</label>
+                                <label class="form-label fw-bold">{{ form.projet.label }} <span class="text-danger">*</span></label>
                                 {% render_field form.projet class="form-select" %}
                                 {% if form.projet.errors %}
-                                <div class="text-danger">{{ form.projet.errors }}</div>
+                                <div class="text-danger small mt-1">{{ form.projet.errors }}</div>
                                 {% endif %}
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.fournisseur.label }}</label>
+                                <label class="form-label fw-bold">{{ form.fournisseur.label }} <span class="text-danger">*</span></label>
                                 {% render_field form.fournisseur class="form-select" %}
                                 {% if form.fournisseur.errors %}
-                                <div class="text-danger">{{ form.fournisseur.errors }}</div>
+                                <div class="text-danger small mt-1">{{ form.fournisseur.errors }}</div>
                                 {% endif %}
                             </div>
                         </div>
                         
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.date_achat.label }}</label>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">{{ form.date_achat.label }} <span class="text-danger">*</span></label>
                                 {% render_field form.date_achat class="form-control" %}
                                 {% if form.date_achat.errors %}
-                                <div class="text-danger">{{ form.date_achat.errors }}</div>
+                                <div class="text-danger small mt-1">{{ form.date_achat.errors }}</div>
                                 {% endif %}
                             </div>
                             
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.mode_paiement.label }}</label>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">{{ form.mode_paiement.label }}</label>
                                 {% render_field form.mode_paiement class="form-select" %}
                                 {% if form.mode_paiement.errors %}
-                                <div class="text-danger">{{ form.mode_paiement.errors }}</div>
+                                <div class="text-danger small mt-1">{{ form.mode_paiement.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">{{ form.numero_facture.label }}</label>
+                                {% render_field form.numero_facture class="form-control" placeholder="N° Facture" %}
+                                {% if form.numero_facture.errors %}
+                                <div class="text-danger small mt-1">{{ form.numero_facture.errors }}</div>
                                 {% endif %}
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.numero_facture.label }}</label>
-                                {% render_field form.numero_facture class="form-control" %}
-                                {% if form.numero_facture.errors %}
-                                <div class="text-danger">{{ form.numero_facture.errors }}</div>
+                                <label class="form-label fw-bold">{{ form.piece_justificative.label }}</label>
+                                {% render_field form.piece_justificative class="form-control" %}
+                                {% if form.piece_justificative.errors %}
+                                <div class="text-danger small mt-1">{{ form.piece_justificative.errors }}</div>
                                 {% endif %}
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.piece_justificative.label }}</label>
-                                {% render_field form.piece_justificative class="form-control" %}
-                                {% if form.piece_justificative.errors %}
-                                <div class="text-danger">{{ form.piece_justificative.errors }}</div>
+                                <label class="form-label fw-bold">{{ form.notes.label }}</label>
+                                {% render_field form.notes class="form-control" rows="2" placeholder="Notes complémentaires..." %}
+                                {% if form.notes.errors %}
+                                <div class="text-danger small mt-1">{{ form.notes.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">{{ form.notes.label }}</label>
-                            {% render_field form.notes class="form-control" rows="3" %}
-                            {% if form.notes.errors %}
-                            <div class="text-danger">{{ form.notes.errors }}</div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
 
                 <!-- Lignes d'achat -->
                 <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Produits à acheter</h5>
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-box me-2"></i>Produits à acheter</h5>
+                        <button type="button" class="btn btn-light btn-sm" id="add-ligne-btn">
+                            <i class="fas fa-plus me-1"></i>Ajouter une ligne
+                        </button>
                     </div>
                     <div class="card-body">
                         {{ formset.management_form }}
                         
-                        <div id="formset-container">
+                        <div id="lignes-container">
                             {% for form in formset %}
-                            <div class="formset-form border p-3 mb-3 rounded">
-                                {{ form.id }}
-                                <div class="row">
-                                    <div class="col-md-5 mb-2">
-                                        <label class="form-label">Produit</label>
-                                        {% render_field form.produit class="form-select" %}
+                            <div class="ligne-achat border rounded p-3 mb-3 {% if form.instance.pk %}bg-light{% endif %}">
+                                <div class="row align-items-end">
+                                    <div class="col-md-4 mb-2">
+                                        <label class="form-label small fw-bold">Produit <span class="text-danger">*</span></label>
+                                        {% render_field form.produit class="form-select form-select-sm" %}
                                     </div>
+                                    
                                     <div class="col-md-2 mb-2">
-                                        <label class="form-label">Quantité</label>
-                                        {% render_field form.quantite class="form-control number-input" %}
+                                        <label class="form-label small fw-bold">Quantité <span class="text-danger">*</span></label>
+                                        {% render_field form.quantite class="form-control form-control-sm number-input" placeholder="0" %}
                                     </div>
+                                    
                                     <div class="col-md-3 mb-2">
-                                        <label class="form-label">Prix unitaire</label>
-                                        {% render_field form.prix_unitaire class="form-control money-input" %}
+                                        <label class="form-label small fw-bold">Prix unitaire <span class="text-danger">*</span></label>
+                                        {% render_field form.prix_unitaire class="form-control form-control-sm money-input" placeholder="0" %}
                                     </div>
+                                    
                                     <div class="col-md-2 mb-2">
-                                        <label class="form-label">Supprimer</label>
-                                        {% render_field form.DELETE class="form-check-input" %}
+                                        <label class="form-label small fw-bold">Montant</label>
+                                        <input type="text" class="form-control form-control-sm montant-ligne bg-light" readonly value="0">
+                                    </div>
+                                    
+                                    <div class="col-md-1 mb-2 text-center">
+                                        <button type="button" class="btn btn-danger btn-sm delete-ligne-btn" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </div>
+                                
                                 <div class="row">
                                     <div class="col-12">
-                                        <label class="form-label">Notes</label>
-                                        {% render_field form.notes class="form-control" rows="2" %}
+                                        <label class="form-label small fw-bold">Notes</label>
+                                        {% render_field form.notes class="form-control form-control-sm" rows="1" placeholder="Notes sur ce produit..." %}
                                     </div>
+                                </div>
+                                
+                                <div class="d-none">
+                                    {{ form.id }}
+                                    {{ form.DELETE }}
                                 </div>
                             </div>
                             {% endfor %}
                         </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-8"></div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="mb-3">Montant Total</h5>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold">Total HT:</span>
+                                            <span class="fs-4 text-primary fw-bold" id="montant-total">0 FCFA</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Enregistrer
+                <!-- Boutons d'action -->
+                <div class="mb-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-2"></i>Enregistrer l'achat
                     </button>
-                    <a href="{% url 'inventory:achat_list' %}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Annuler
+                    <a href="{% url 'inventory:achat_list' %}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>Annuler
                     </a>
                 </div>
             </div>
-
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header">
-                        <h5 class="mb-0">Statut</h5>
+            
+            <div class="col-lg-4">
+                <!-- Statut -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-flag me-2"></i>Statut</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label">{{ form.statut.label }}</label>
+                            <label class="form-label fw-bold">{{ form.statut.label }}</label>
                             {% render_field form.statut class="form-select" %}
                             {% if form.statut.errors %}
-                            <div class="text-danger">{{ form.statut.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.statut.errors }}</div>
                             {% endif %}
                         </div>
                         
-                        <div class="alert alert-info">
-                            <small>
-                                <i class="fas fa-info-circle"></i>
-                                <strong>Brouillon:</strong> Achat en cours de saisie<br>
-                                <strong>Validé:</strong> Achat confirmé, en attente de réception<br>
-                                <strong>Reçu:</strong> Produits reçus, stocks mis à jour
-                            </small>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.date_reception.label }}</label>
+                            {% render_field form.date_reception class="form-control" %}
+                            {% if form.date_reception.errors %}
+                            <div class="text-danger small mt-1">{{ form.date_reception.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Date de réception des produits</small>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Aide -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-warning">
+                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="small mb-2"><strong>Statuts disponibles :</strong></p>
+                        <ul class="small mb-0">
+                            <li><strong>Brouillon:</strong> Achat en cours de préparation</li>
+                            <li><strong>Validé:</strong> Achat confirmé, en attente de réception</li>
+                            <li><strong>Reçu:</strong> Produits reçus, stocks mis à jour</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -172,75 +221,176 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Fonction pour formater les nombres avec espaces
-    function formatNumber(value) {
-        if (!value) return value;
-        value = value.toString().replace(/\s/g, '');
-        let parts = value.split('.');
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-        return parts.join('.');
-    }
+(function() {
+    'use strict';
     
-    // Fonction pour nettoyer le nombre
-    function cleanNumber(value) {
-        return value.replace(/\s/g, '');
-    }
-    
-    // Formater les valeurs initiales
-    document.querySelectorAll('.money-input, .number-input').forEach(function(input) {
-        if (input.value) {
-            input.value = formatNumber(input.value);
+    // Utilitaires de formatage
+    const Formatage = {
+        formater: function(valeur) {
+            if (!valeur) return '';
+            valeur = valeur.toString().replace(/\s/g, '');
+            const parties = valeur.split('.');
+            parties[0] = parties[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            return parties.join('.');
+        },
+        
+        nettoyer: function(valeur) {
+            if (!valeur) return '';
+            return valeur.toString().replace(/\s/g, '');
+        },
+        
+        parseFloat: function(valeur) {
+            return parseFloat(this.nettoyer(valeur)) || 0;
         }
-    });
+    };
     
-    // Utiliser la délégation d'événements pour gérer les champs dynamiques
-    document.addEventListener('focus', function(e) {
-        if (e.target.matches('.money-input, .number-input')) {
-            e.target.value = cleanNumber(e.target.value);
-        }
-    }, true);
-    
-    document.addEventListener('blur', function(e) {
-        if (e.target.matches('.money-input, .number-input')) {
-            if (e.target.value) {
-                e.target.value = formatNumber(e.target.value);
-            }
-        }
-    }, true);
-    
-    // Observer pour les nouveaux champs ajoutés dynamiquement (formsets)
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(function(node) {
-                if (node.nodeType === 1) { // Element node
-                    const inputs = node.querySelectorAll ? node.querySelectorAll('.money-input, .number-input') : [];
-                    inputs.forEach(function(input) {
-                        if (input.value) {
-                            input.value = formatNumber(input.value);
-                        }
-                    });
+    // Gestion des lignes d'achat
+    const GestionLignes = {
+        init: function() {
+            this.attacherEvenements();
+            this.calculerTotaux();
+        },
+        
+        attacherEvenements: function() {
+            const container = document.getElementById('lignes-container');
+            if (!container) return;
+            
+            // Délégation d'événements pour les champs
+            container.addEventListener('focus', (e) => {
+                if (e.target.matches('.money-input, .number-input')) {
+                    e.target.value = Formatage.nettoyer(e.target.value);
                 }
+            }, true);
+            
+            container.addEventListener('blur', (e) => {
+                if (e.target.matches('.money-input, .number-input')) {
+                    if (e.target.value) {
+                        e.target.value = Formatage.formater(e.target.value);
+                    }
+                    this.calculerMontantLigne(e.target.closest('.ligne-achat'));
+                }
+            }, true);
+            
+            container.addEventListener('input', (e) => {
+                if (e.target.matches('.number-input, .money-input')) {
+                    this.calculerMontantLigne(e.target.closest('.ligne-achat'));
+                }
+            });
+            
+            container.addEventListener('click', (e) => {
+                if (e.target.closest('.delete-ligne-btn')) {
+                    this.supprimerLigne(e.target.closest('.ligne-achat'));
+                }
+            });
+            
+            // Bouton ajouter ligne
+            document.getElementById('add-ligne-btn')?.addEventListener('click', () => {
+                this.ajouterLigne();
+            });
+        },
+        
+        calculerMontantLigne: function(ligne) {
+            if (!ligne) return;
+            
+            const quantiteInput = ligne.querySelector('.number-input');
+            const prixInput = ligne.querySelector('.money-input');
+            const montantInput = ligne.querySelector('.montant-ligne');
+            
+            if (quantiteInput && prixInput && montantInput) {
+                const quantite = Formatage.parseFloat(quantiteInput.value);
+                const prix = Formatage.parseFloat(prixInput.value);
+                const montant = quantite * prix;
+                
+                montantInput.value = Formatage.formater(montant.toFixed(2));
+            }
+            
+            this.calculerTotaux();
+        },
+        
+        calculerTotaux: function() {
+            let total = 0;
+            
+            document.querySelectorAll('.ligne-achat').forEach(ligne => {
+                const deleteCheckbox = ligne.querySelector('input[name$="-DELETE"]');
+                if (deleteCheckbox?.checked) return;
+                
+                const quantiteInput = ligne.querySelector('.number-input');
+                const prixInput = ligne.querySelector('.money-input');
+                
+                if (quantiteInput && prixInput) {
+                    const quantite = Formatage.parseFloat(quantiteInput.value);
+                    const prix = Formatage.parseFloat(prixInput.value);
+                    total += quantite * prix;
+                }
+            });
+            
+            const montantTotalEl = document.getElementById('montant-total');
+            if (montantTotalEl) {
+                montantTotalEl.textContent = Formatage.formater(total.toFixed(2)) + ' FCFA';
+            }
+        },
+        
+        supprimerLigne: function(ligne) {
+            const deleteCheckbox = ligne.querySelector('input[name$="-DELETE"]');
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+                ligne.style.display = 'none';
+                this.calculerTotaux();
+            }
+        },
+        
+        ajouterLigne: function() {
+            const container = document.getElementById('lignes-container');
+            const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
+            
+            if (!container || !totalFormsInput) return;
+            
+            const formNum = parseInt(totalFormsInput.value);
+            const premiereLigne = container.querySelector('.ligne-achat');
+            
+            if (!premiereLigne) return;
+            
+            const nouvelleLigne = premiereLigne.cloneNode(true);
+            
+            // Mettre à jour les attributs
+            nouvelleLigne.querySelectorAll('input, select, textarea').forEach(input => {
+                if (input.name) {
+                    input.name = input.name.replace(/-\d+-/, `-${formNum}-`);
+                }
+                if (input.id) {
+                    input.id = input.id.replace(/-\d+-/, `-${formNum}-`);
+                }
+                
+                // Réinitialiser les valeurs
+                if (!input.name.includes('DELETE') && !input.name.includes('id')) {
+                    if (input.type === 'checkbox') {
+                        input.checked = false;
+                    } else {
+                        input.value = '';
+                    }
+                }
+            });
+            
+            nouvelleLigne.style.display = '';
+            nouvelleLigne.classList.remove('bg-light');
+            container.appendChild(nouvelleLigne);
+            
+            totalFormsInput.value = formNum + 1;
+            this.calculerTotaux();
+        }
+    };
+    
+    // Initialisation au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        GestionLignes.init();
+        
+        // Nettoyer avant soumission
+        document.getElementById('achat-form')?.addEventListener('submit', function() {
+            document.querySelectorAll('.money-input, .number-input').forEach(input => {
+                input.value = Formatage.nettoyer(input.value);
             });
         });
     });
-    
-    // Observer le conteneur du formset
-    const formsetContainer = document.querySelector('form');
-    if (formsetContainer) {
-        observer.observe(formsetContainer, {
-            childList: true,
-            subtree: true
-        });
-    }
-    
-    // Nettoyer avant soumission
-    document.querySelector('form').addEventListener('submit', function() {
-        document.querySelectorAll('.money-input, .number-input').forEach(function(input) {
-            input.value = cleanNumber(input.value);
-        });
-    });
-});
+})();
 </script>
 {% endblock %}
-
