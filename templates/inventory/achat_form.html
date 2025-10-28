@@ -175,8 +175,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Fonction pour formater les nombres avec espaces
     function formatNumber(value) {
-        value = value.replace(/\s/g, '');
-        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        if (!value) return value;
+        value = value.toString().replace(/\s/g, '');
+        let parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        return parts.join('.');
     }
     
     // Fonction pour nettoyer le nombre
@@ -192,33 +195,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             input.addEventListener('input', function(e) {
-                let cursorPosition = this.selectionStart;
-                let valueBeforeCursor = this.value.substring(0, cursorPosition);
+                let value = this.value;
+                let cursorPos = this.selectionStart;
+                let spacesBefore = (value.substring(0, cursorPos).match(/\s/g) || []).length;
                 
-                let cleanValue = this.value.replace(/[^\d.]/g, '');
-                
-                // Limiter à un seul point décimal
-                let parts = cleanValue.split('.');
+                let cleaned = value.replace(/[^\d.]/g, '');
+                let parts = cleaned.split('.');
                 if (parts.length > 2) {
-                    cleanValue = parts[0] + '.' + parts.slice(1).join('');
+                    cleaned = parts[0] + '.' + parts.slice(1).join('');
                 }
                 
-                parts = cleanValue.split('.');
-                let integerPart = parts[0];
-                let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
-                
-                let formattedInteger = formatNumber(integerPart);
-                this.value = formattedInteger + decimalPart;
-                
-                // Calculer la nouvelle position du curseur
-                let cleanBeforeCursor = valueBeforeCursor.replace(/[^\d.]/g, '');
-                let formattedBeforeCursor = formatNumber(cleanBeforeCursor.split('.')[0]);
-                if (cleanBeforeCursor.includes('.')) {
-                    formattedBeforeCursor += '.' + cleanBeforeCursor.split('.')[1];
+                this.value = cleaned;
+                let newPos = cursorPos - spacesBefore;
+                this.setSelectionRange(newPos, newPos);
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this.value) {
+                    this.value = formatNumber(this.value);
                 }
-                let newCursorPosition = formattedBeforeCursor.length;
-                
-                this.setSelectionRange(newCursorPosition, newCursorPosition);
+            });
+            
+            input.addEventListener('focus', function() {
+                this.value = cleanNumber(this.value);
             });
         });
     }
