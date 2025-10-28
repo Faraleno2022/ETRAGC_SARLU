@@ -238,10 +238,16 @@
                             <i class="fas fa-users"></i> Clients
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.app_name == 'finances' %}active{% endif %}" href="{% url 'finances:transaction_list' %}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'finances' %}active{% endif %}" href="#" id="financesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-money-bill-wave"></i> Finances
                         </a>
+                        <ul class="dropdown-menu" aria-labelledby="financesDropdown">
+                            <li><a class="dropdown-item" href="{% url 'finances:transaction_list' %}"><i class="fas fa-exchange-alt me-2"></i>Transactions</a></li>
+                            <li><a class="dropdown-item" href="{% url 'finances:fournisseur_list' %}"><i class="fas fa-truck me-2"></i>Fournisseurs</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'finances:depense_list' %}"><i class="fas fa-receipt me-2"></i>Dépenses</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}" href="{% url 'inventory:dashboard' %}">
