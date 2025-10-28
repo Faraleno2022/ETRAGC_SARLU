@@ -148,12 +148,12 @@
                         <div class="row mt-4">
                             <div class="col-md-8"></div>
                             <div class="col-md-4">
-                                <div class="card bg-light">
+                                <div class="card bg-light border-primary">
                                     <div class="card-body">
-                                        <h5 class="mb-3">Montant Total</h5>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold">Total HT:</span>
-                                            <span class="fs-4 text-primary fw-bold" id="montant-total">0 FCFA</span>
+                                        <h6 class="mb-2 text-muted">Montant Total</h6>
+                                        <div class="text-end">
+                                            <div class="small text-muted mb-1">Total HT</div>
+                                            <div class="fs-5 text-primary fw-bold text-break" id="montant-total" style="word-wrap: break-word;">0 GNF</div>
                                         </div>
                                     </div>
                                 </div>
@@ -326,7 +326,7 @@
             
             const montantTotalEl = document.getElementById('montant-total');
             if (montantTotalEl) {
-                montantTotalEl.textContent = Formatage.formater(total.toFixed(2)) + ' FCFA';
+                montantTotalEl.textContent = Formatage.formater(total.toFixed(2)) + ' GNF';
             }
         },
         
