@@ -187,27 +187,52 @@ document.addEventListener('DOMContentLoaded', function() {
         return value.replace(/\s/g, '');
     }
     
-    // Appliquer le formatage
-    function applyFormatting() {
-        document.querySelectorAll('.money-input, .number-input').forEach(function(input) {
-            if (input.value) {
-                input.value = formatNumber(input.value);
+    // Formater les valeurs initiales
+    document.querySelectorAll('.money-input, .number-input').forEach(function(input) {
+        if (input.value) {
+            input.value = formatNumber(input.value);
+        }
+    });
+    
+    // Utiliser la délégation d'événements pour gérer les champs dynamiques
+    document.addEventListener('focus', function(e) {
+        if (e.target.matches('.money-input, .number-input')) {
+            e.target.value = cleanNumber(e.target.value);
+        }
+    }, true);
+    
+    document.addEventListener('blur', function(e) {
+        if (e.target.matches('.money-input, .number-input')) {
+            if (e.target.value) {
+                e.target.value = formatNumber(e.target.value);
             }
-            
-            input.addEventListener('blur', function() {
-                if (this.value) {
-                    this.value = formatNumber(this.value);
+        }
+    }, true);
+    
+    // Observer pour les nouveaux champs ajoutés dynamiquement (formsets)
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1) { // Element node
+                    const inputs = node.querySelectorAll ? node.querySelectorAll('.money-input, .number-input') : [];
+                    inputs.forEach(function(input) {
+                        if (input.value) {
+                            input.value = formatNumber(input.value);
+                        }
+                    });
                 }
             });
-            
-            input.addEventListener('focus', function() {
-                this.value = cleanNumber(this.value);
-            });
+        });
+    });
+    
+    // Observer le conteneur du formset
+    const formsetContainer = document.querySelector('form');
+    if (formsetContainer) {
+        observer.observe(formsetContainer, {
+            childList: true,
+            subtree: true
         });
     }
-    
-    // Appliquer au chargement
-    applyFormatting();
     
     // Nettoyer avant soumission
     document.querySelector('form').addEventListener('submit', function() {
