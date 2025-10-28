@@ -433,6 +433,23 @@ class Achat(models.Model):
             
             self.numero_achat = f'ACH-{year}-{new_number:04d}'
         
+        # Déduire du budget du projet si l'achat est validé ou reçu
+        if self.pk:  # Si l'achat existe déjà (modification)
+            old_achat = Achat.objects.get(pk=self.pk)
+            # Si le statut change vers Validé ou Reçu
+            if old_achat.statut in ['Brouillon'] and self.statut in ['Validé', 'Reçu']:
+                # Créer une transaction de dépense pour déduire du budget
+                from apps.finances.models import Transaction
+                Transaction.objects.create(
+                    projet=self.projet,
+                    type='Dépense',
+                    categorie='Achat',
+                    montant=self.montant_total,
+                    description=f'Achat {self.numero_achat} - {self.fournisseur.nom}',
+                    date_transaction=self.date_achat,
+                    statut='Validée'
+                )
+        
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):

@@ -365,6 +365,25 @@ class Depense(models.Model):
     def __str__(self):
         return f"{self.categorie.nom} - {self.montant} GNF - {self.projet.code_projet}"
     
+    def save(self, *args, **kwargs):
+        # Déduire du budget du projet si la dépense est validée
+        if self.pk:  # Si la dépense existe déjà (modification)
+            old_depense = Depense.objects.get(pk=self.pk)
+            # Si le statut change vers Validée
+            if old_depense.statut != 'Validée' and self.statut == 'Validée':
+                # Créer une transaction de dépense pour déduire du budget
+                Transaction.objects.create(
+                    projet=self.projet,
+                    type='Dépense',
+                    categorie=self.categorie.nom,
+                    montant=self.montant,
+                    description=f'Dépense {self.categorie.nom} - {self.description or ""}',
+                    date_transaction=self.date_depense,
+                    statut='Validée'
+                )
+        
+        super().save(*args, **kwargs)
+    
     def get_absolute_url(self):
         return reverse('finances:depense_detail', kwargs={'pk': self.pk})
     
