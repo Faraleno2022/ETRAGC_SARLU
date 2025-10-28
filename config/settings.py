@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     # Security apps
     'axes',
     'corsheaders',
-    'csp',
+    # 'csp',  # Désactivé pour permettre le chargement des formulaires
     
     # Third party apps
     'crispy_forms',
@@ -70,7 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'csp.middleware.CSPMiddleware',
+    # 'csp.middleware.CSPMiddleware',  # Désactivé pour permettre le chargement des formulaires
     'axes.middleware.AxesMiddleware',
 ]
 
@@ -309,17 +309,18 @@ CORS_ALLOWED_ORIGINS = []
 CORS_ALLOW_CREDENTIALS = True
 
 # Content Security Policy (nouvelle configuration django-csp 4.0+)
-CONTENT_SECURITY_POLICY = {
-    'DIRECTIVES': {
-        'default-src': ("'self'",),
-        'script-src': ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"),
-        'style-src': ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"),
-        'img-src': ("'self'", "data:", "https:"),
-        'font-src': ("'self'", "https://cdnjs.cloudflare.com"),
-        'connect-src': ("'self'",),
-        'frame-ancestors': ("'none'",),
-    }
-}
+# Désactivé pour permettre le chargement des formulaires
+# CONTENT_SECURITY_POLICY = {
+#     'DIRECTIVES': {
+#         'default-src': ("'self'",),
+#         'script-src': ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"),
+#         'style-src': ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"),
+#         'img-src': ("'self'", "data:", "https:"),
+#         'font-src': ("'self'", "https://cdnjs.cloudflare.com"),
+#         'connect-src': ("'self'",),
+#         'frame-ancestors': ("'none'",),
+#     }
+# }
 
 # Security Headers
 SECURE_BROWSER_XSS_FILTER = True
