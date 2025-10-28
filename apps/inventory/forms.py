@@ -82,8 +82,18 @@ class LigneAchatForm(forms.ModelForm):
         fields = ['produit', 'quantite', 'prix_unitaire', 'notes']
         widgets = {
             'produit': forms.Select(attrs={'class': 'form-select'}),
-            'quantite': forms.NumberInput(attrs={'class': 'form-control number-input', 'step': '0.01', 'min': '0'}),
-            'prix_unitaire': forms.NumberInput(attrs={'class': 'form-control money-input', 'step': '0.01', 'min': '0'}),
+            'quantite': forms.NumberInput(attrs={
+                'class': 'form-control number-input', 
+                'step': '0.01', 
+                'min': '0',
+                'max': '999999999'
+            }),
+            'prix_unitaire': forms.NumberInput(attrs={
+                'class': 'form-control money-input', 
+                'step': '0.01', 
+                'min': '0',
+                'max': '999999999999'
+            }),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
 
