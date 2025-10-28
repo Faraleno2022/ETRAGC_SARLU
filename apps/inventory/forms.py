@@ -40,8 +40,8 @@ class ProduitForm(forms.ModelForm):
             'categorie': forms.Select(attrs={'class': 'form-select'}),
             'unite_mesure': forms.Select(attrs={'class': 'form-select'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'prix_unitaire_moyen': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'stock_minimum': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'prix_unitaire_moyen': forms.NumberInput(attrs={'class': 'form-control money-input', 'step': '0.01', 'min': '0'}),
+            'stock_minimum': forms.NumberInput(attrs={'class': 'form-control number-input', 'step': '0.01', 'min': '0'}),
             'actif': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
@@ -53,7 +53,7 @@ class StockForm(forms.ModelForm):
         widgets = {
             'projet': forms.Select(attrs={'class': 'form-select'}),
             'produit': forms.Select(attrs={'class': 'form-select'}),
-            'quantite_actuelle': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'quantite_actuelle': forms.NumberInput(attrs={'class': 'form-control number-input', 'step': '0.01', 'min': '0'}),
             'emplacement': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
@@ -82,8 +82,8 @@ class LigneAchatForm(forms.ModelForm):
         fields = ['produit', 'quantite', 'prix_unitaire', 'notes']
         widgets = {
             'produit': forms.Select(attrs={'class': 'form-select'}),
-            'quantite': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'prix_unitaire': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'quantite': forms.NumberInput(attrs={'class': 'form-control number-input', 'step': '0.01', 'min': '0'}),
+            'prix_unitaire': forms.NumberInput(attrs={'class': 'form-control money-input', 'step': '0.01', 'min': '0'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
 
@@ -107,7 +107,7 @@ class MouvementStockForm(forms.ModelForm):
         widgets = {
             'stock': forms.Select(attrs={'class': 'form-select'}),
             'type_mouvement': forms.Select(attrs={'class': 'form-select'}),
-            'quantite': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'quantite': forms.NumberInput(attrs={'class': 'form-control number-input', 'step': '0.01', 'min': '0'}),
             'projet_destination': forms.Select(attrs={'class': 'form-select'}),
             'motif': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
