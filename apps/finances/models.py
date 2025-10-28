@@ -12,6 +12,7 @@ class Transaction(models.Model):
     TYPE_CHOICES = [
         ('Dépôt', 'Dépôt'),
         ('Retrait', 'Retrait'),
+        ('Dépense', 'Dépense'),
     ]
     
     MODE_PAIEMENT_CHOICES = [
@@ -50,11 +51,26 @@ class Transaction(models.Model):
     mode_paiement = models.CharField(
         max_length=20,
         choices=MODE_PAIEMENT_CHOICES,
+        blank=True,
+        null=True,
         verbose_name='Mode de paiement'
+    )
+    categorie = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Catégorie'
+    )
+    statut = models.CharField(
+        max_length=20,
+        default='Validée',
+        verbose_name='Statut'
     )
     saisi_par = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
         related_name='transactions_saisies',
         verbose_name='Saisi par'
     )
@@ -86,6 +102,32 @@ class Transaction(models.Model):
     
     def __str__(self):
         return f"{self.type} - {self.montant} GNF - {self.projet.code_projet}"
+    
+    def save(self, *args, **kwargs):
+        # Mettre à jour le budget du projet
+        super().save(*args, **kwargs)
+        
+        # Recalculer le solde du projet
+        from apps.projects.models import Projet
+        projet = Projet.objects.get(pk=self.projet.pk)
+        
+        # Calculer total dépôts
+        total_depots = Transaction.objects.filter(
+            projet=projet,
+            type='Dépôt',
+            statut='Validée'
+        ).aggregate(total=models.Sum('montant'))['total'] or 0
+        
+        # Calculer total retraits et dépenses
+        total_sorties = Transaction.objects.filter(
+            projet=projet,
+            type__in=['Retrait', 'Dépense'],
+            statut='Validée'
+        ).aggregate(total=models.Sum('montant'))['total'] or 0
+        
+        # Le montant_prevu représente le budget initial + dépôts - sorties
+        # On ne modifie pas montant_prevu, c'est le budget initial
+        # Les dépenses sont suivies via get_total_depenses()
     
     def get_absolute_url(self):
         return reverse('finances:transaction_detail', kwargs={'pk': self.pk})

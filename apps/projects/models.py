@@ -158,24 +158,45 @@ class Projet(models.Model):
         return self.get_total_depots() - self.get_total_retraits()
     
     def get_total_depenses(self):
-        """Retourne le total des dépenses validées"""
-        from apps.finances.models import Depense
-        total = Depense.objects.filter(
+        """Retourne le total de toutes les dépenses (Dépenses + Achats + Retraits)"""
+        from apps.finances.models import Transaction
+        
+        # Total des transactions de type Dépense et Retrait
+        total_transactions = Transaction.objects.filter(
             projet=self,
+            type__in=['Dépense', 'Retrait'],
             statut='Validée'
-        ).aggregate(total=models.Sum('montant'))['total']
-        return total or 0
+        ).aggregate(total=models.Sum('montant'))['total'] or 0
+        
+        return total_transactions
+    
+    def get_total_depots(self):
+        """Retourne le total des dépôts"""
+        from apps.finances.models import Transaction
+        
+        total = Transaction.objects.filter(
+            projet=self,
+            type='Dépôt',
+            statut='Validée'
+        ).aggregate(total=models.Sum('montant'))['total'] or 0
+        
+        return total
+    
+    def get_budget_disponible(self):
+        """Retourne le budget disponible (Budget initial + Dépôts - Dépenses)"""
+        return self.montant_prevu + self.get_total_depots() - self.get_total_depenses()
     
     def get_pourcentage_budget_consomme(self):
         """Retourne le pourcentage du budget consommé"""
         from decimal import Decimal
-        if self.montant_prevu > 0:
-            return float((self.get_total_depenses() / self.montant_prevu) * Decimal('100'))
+        budget_total = self.montant_prevu + self.get_total_depots()
+        if budget_total > 0:
+            return float((self.get_total_depenses() / budget_total) * Decimal('100'))
         return 0
     
     def is_budget_depasse(self):
         """Vérifie si le budget est dépassé"""
-        return self.get_total_depenses() > self.montant_prevu
+        return self.get_budget_disponible() < 0
     
     def get_duree_prevue_jours(self):
         """Retourne la durée prévue en jours"""
