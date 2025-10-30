@@ -54,7 +54,9 @@
                         <th>Code</th>
                         <th>Nom du Projet</th>
                         <th>Client</th>
-                        <th>Budget</th>
+                        <th>Budget Prévu</th>
+                        <th>Montant Dépensé</th>
+                        <th>Montant Disponible</th>
                         <th>Statut</th>
                         <th>Avancement</th>
                         <th>Actions</th>
@@ -62,11 +64,48 @@
                 </thead>
                 <tbody>
                     {% for projet in projets %}
+                    {% with total_depenses=projet.get_total_depenses total_depots=projet.get_total_depots montant_global=projet.montant_prevu|add:projet.get_total_depots solde_disponible=projet.get_budget_disponible %}
                     <tr>
                         <td><a href="{% url 'projects:detail' projet.pk %}" class="fw-bold">{{ projet.code_projet }}</a></td>
                         <td>{{ projet.nom_projet|truncatewords:8 }}</td>
                         <td>{{ projet.client.nom_complet }}</td>
-                        <td>{{ projet.montant_prevu|floatformat:0|intcomma }} GNF</td>
+                        <td>
+                            <span class="text-muted small d-block">Budget: {{ projet.montant_prevu|floatformat:0|intcomma }} GNF</span>
+                            {% if total_depots > 0 %}
+                            <span class="text-success small d-block">+Dépôts: {{ total_depots|floatformat:0|intcomma }} GNF</span>
+                            {% endif %}
+                            <strong class="text-primary">{{ montant_global|floatformat:0|intcomma }} GNF</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-danger" style="font-size: 0.9rem;">
+                                {{ total_depenses|floatformat:0|intcomma }} GNF
+                            </span>
+                            {% if montant_global > 0 %}
+                            <div class="progress mt-1" style="height: 5px;">
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: {% widthratio total_depenses montant_global 100 %}%;">
+                                </div>
+                            </div>
+                            <small class="text-muted">{% widthratio total_depenses montant_global 100 %}% dépensé</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if solde_disponible < 0 %}
+                            <span class="badge bg-danger" style="font-size: 0.9rem;">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ solde_disponible|floatformat:0|intcomma }} GNF
+                            </span>
+                            <small class="text-danger d-block">Budget dépassé!</small>
+                            {% elif solde_disponible < montant_global|divisibleby:10 %}
+                            <span class="badge bg-warning text-dark" style="font-size: 0.9rem;">
+                                {{ solde_disponible|floatformat:0|intcomma }} GNF
+                            </span>
+                            <small class="text-warning d-block">Solde faible</small>
+                            {% else %}
+                            <span class="badge bg-success" style="font-size: 0.9rem;">
+                                {{ solde_disponible|floatformat:0|intcomma }} GNF
+                            </span>
+                            {% endif %}
+                        </td>
                         <td><span class="badge {{ projet.get_statut_badge_class }}">{{ projet.get_statut_display }}</span></td>
                         <td>
                             <div class="progress" style="height: 20px;">
@@ -85,6 +124,7 @@
                             </a>
                         </td>
                     </tr>
+                    {% endwith %}
                     {% endfor %}
                 </tbody>
             </table>

@@ -394,6 +394,27 @@ class PaiementPersonnel(models.Model):
     def __str__(self):
         return f"{self.personnel.get_full_name()} - {self.montant} GNF - {self.projet.code_projet}"
     
+    def save(self, *args, **kwargs):
+        # Déduire du budget du projet si le paiement est validé
+        if self.pk:  # Si le paiement existe déjà (modification)
+            old_paiement = PaiementPersonnel.objects.get(pk=self.pk)
+            # Si le statut change vers Validé
+            if old_paiement.statut != 'Validé' and self.statut == 'Validé':
+                # Créer une transaction de dépense pour déduire du budget
+                from apps.finances.models import Transaction
+                Transaction.objects.create(
+                    projet=self.projet,
+                    type='Dépense',
+                    categorie='Paiement Personnel',
+                    montant=self.montant,
+                    description=f'Paiement {self.personnel.get_full_name()} - {self.description or ""}',
+                    date_transaction=self.date_paiement,
+                    mode_paiement=self.mode_paiement,
+                    statut='Validée'
+                )
+        
+        super().save(*args, **kwargs)
+    
     def get_absolute_url(self):
         return reverse('personnel:paiement_detail', kwargs={'pk': self.pk})
     

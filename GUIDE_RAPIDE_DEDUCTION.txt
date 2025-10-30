@@ -1,0 +1,74 @@
+═══════════════════════════════════════════════════════════════════
+    GUIDE RAPIDE - DÉDUCTION AUTOMATIQUE DU SOLDE DES PROJETS
+═══════════════════════════════════════════════════════════════════
+
+📌 PRINCIPE DE BASE
+───────────────────
+Lorsque vous VALIDEZ une dépense, un achat ou un paiement personnel,
+le montant est AUTOMATIQUEMENT DÉDUIT du solde du projet.
+
+
+💰 FORMULE DU SOLDE
+───────────────────
+Solde = Budget Initial + Dépôts - Dépenses
+
+
+✅ 3 TYPES D'OPÉRATIONS QUI DÉDUISENT AUTOMATIQUEMENT
+──────────────────────────────────────────────────────
+
+1. DÉPENSES (Module Finances)
+   • Créez une dépense → Statut "En attente"
+   • Validez-la → Statut "Validée"
+   • ✓ Montant déduit automatiquement
+
+2. ACHATS DE MATÉRIAUX (Module Inventaire)
+   • Créez un achat → Statut "Brouillon"
+   • Validez-le → Statut "Validé" ou "Reçu"
+   • ✓ Montant total déduit automatiquement
+
+3. PAIEMENTS PERSONNEL (Module Personnel)
+   • Créez un paiement → Statut "En attente"
+   • Validez-le → Statut "Validé"
+   • ✓ Montant déduit automatiquement
+
+
+📋 EXEMPLE CONCRET
+──────────────────
+Projet : Construction Villa Moderne
+Budget initial : 100,000,000 GNF
+Dépôt client : +50,000,000 GNF
+─────────────────────────────────────
+Solde actuel : 150,000,000 GNF
+
+Vous validez :
+• Achat ciment : -5,000,000 GNF
+• Paiement maçon : -1,200,000 GNF
+• Dépense transport : -300,000 GNF
+─────────────────────────────────────
+Nouveau solde : 143,500,000 GNF ✓
+
+
+⚠️ ATTENTION
+────────────
+• La déduction se fait UNE SEULE FOIS lors de la validation
+• Si vous repassez en "En attente", la transaction reste
+• Vérifiez toujours avant de valider !
+
+
+🔍 VÉRIFIER LES DÉDUCTIONS
+──────────────────────────
+1. Allez dans Finances → Transactions
+2. Filtrez par projet
+3. Vous verrez toutes les déductions automatiques
+
+
+📊 CONSULTER LE SOLDE
+─────────────────────
+1. Allez dans Projets → Détail du projet
+2. Section "Budget et Finances"
+3. Consultez le solde disponible
+
+
+═══════════════════════════════════════════════════════════════════
+Pour plus de détails, consultez : DEDUCTION_AUTOMATIQUE.md
+═══════════════════════════════════════════════════════════════════

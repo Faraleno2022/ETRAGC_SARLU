@@ -437,16 +437,17 @@ class Achat(models.Model):
         if self.pk:  # Si l'achat existe déjà (modification)
             old_achat = Achat.objects.get(pk=self.pk)
             # Si le statut change vers Validé ou Reçu
-            if old_achat.statut in ['Brouillon'] and self.statut in ['Validé', 'Reçu']:
+            if old_achat.statut in ['Brouillon', 'Annulé'] and self.statut in ['Validé', 'Reçu']:
                 # Créer une transaction de dépense pour déduire du budget
                 from apps.finances.models import Transaction
                 Transaction.objects.create(
                     projet=self.projet,
                     type='Dépense',
-                    categorie='Achat',
+                    categorie='Achat Matériaux',
                     montant=self.montant_total,
-                    description=f'Achat {self.numero_achat} - {self.fournisseur.nom}',
+                    description=f'Achat {self.numero_achat} - {self.fournisseur.nom} - {self.notes or ""}',
                     date_transaction=self.date_achat,
+                    mode_paiement=self.mode_paiement if self.mode_paiement != 'Crédit' else 'Espèces',
                     statut='Validée'
                 )
         

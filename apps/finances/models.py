@@ -421,6 +421,7 @@ class Depense(models.Model):
                     montant=self.montant,
                     description=f'Dépense {self.categorie.nom} - {self.description or ""}',
                     date_transaction=self.date_depense,
+                    mode_paiement=self.mode_paiement,
                     statut='Validée'
                 )
         

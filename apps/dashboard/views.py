@@ -18,22 +18,57 @@ def dashboard_home(request):
     projets_termines = Projet.objects.filter(statut='Terminé').count()
     total_clients = Client.objects.filter(actif=True).count()
     
-    # Statistiques financières
-    total_depots = Transaction.objects.filter(type='Dépôt').aggregate(
-        total=Sum('montant')
+    # Statistiques financières GLOBALES (tous projets confondus)
+    # Budget prévu total de tous les projets
+    budget_prevu_total = Projet.objects.aggregate(
+        total=Sum('montant_prevu')
     )['total'] or 0
     
-    total_retraits = Transaction.objects.filter(type='Retrait').aggregate(
-        total=Sum('montant')
-    )['total'] or 0
+    # Total des dépôts (tous projets)
+    total_depots = Transaction.objects.filter(
+        type='Dépôt',
+        statut='Validée'
+    ).aggregate(total=Sum('montant'))['total'] or 0
     
-    total_depenses_validees = Depense.objects.filter(statut='Validée').aggregate(
-        total=Sum('montant')
-    )['total'] or 0
+    # Total des retraits (tous projets)
+    total_retraits = Transaction.objects.filter(
+        type='Retrait',
+        statut='Validée'
+    ).aggregate(total=Sum('montant'))['total'] or 0
     
+    # Total des dépenses via transactions (Achats + Dépenses + Paiements)
+    total_depenses_transactions = Transaction.objects.filter(
+        type='Dépense',
+        statut='Validée'
+    ).aggregate(total=Sum('montant'))['total'] or 0
+    
+    # Détail par catégorie de dépenses
+    total_achats_materiaux = Transaction.objects.filter(
+        type='Dépense',
+        categorie='Achat Matériaux',
+        statut='Validée'
+    ).aggregate(total=Sum('montant'))['total'] or 0
+    
+    total_paiements_personnel = Transaction.objects.filter(
+        type='Dépense',
+        categorie='Paiement Personnel',
+        statut='Validée'
+    ).aggregate(total=Sum('montant'))['total'] or 0
+    
+    total_autres_depenses = Transaction.objects.filter(
+        type='Dépense',
+        statut='Validée'
+    ).exclude(
+        categorie__in=['Achat Matériaux', 'Paiement Personnel']
+    ).aggregate(total=Sum('montant'))['total'] or 0
+    
+    # Dépenses en attente de validation
     depenses_en_attente = Depense.objects.filter(statut='En_attente').count()
     
-    solde_global = total_depots - total_retraits
+    # Calcul du montant global disponible
+    # Montant Global = Budget Prévu + Dépôts - Retraits - Dépenses
+    montant_global = budget_prevu_total + total_depots
+    solde_disponible = montant_global - total_retraits - total_depenses_transactions
     
     # Projets récents
     projets_recents = Projet.objects.all()[:5]
@@ -65,15 +100,27 @@ def dashboard_home(request):
     depenses_attente = Depense.objects.filter(statut='En_attente')[:10]
     
     context = {
+        # Statistiques générales
         'total_projets': total_projets,
         'projets_actifs': projets_actifs,
         'projets_termines': projets_termines,
         'total_clients': total_clients,
+        
+        # Statistiques financières globales
+        'budget_prevu_total': budget_prevu_total,
+        'montant_global': montant_global,
         'total_depots': total_depots,
         'total_retraits': total_retraits,
-        'total_depenses_validees': total_depenses_validees,
+        'total_depenses_transactions': total_depenses_transactions,
+        'solde_disponible': solde_disponible,
+        
+        # Détail des dépenses par catégorie
+        'total_achats_materiaux': total_achats_materiaux,
+        'total_paiements_personnel': total_paiements_personnel,
+        'total_autres_depenses': total_autres_depenses,
         'depenses_en_attente': depenses_en_attente,
-        'solde_global': solde_global,
+        
+        # Listes
         'projets_recents': projets_recents,
         'projets_en_retard': projets_en_retard,
         'projets_budget_depasse': projets_budget_depasse,
