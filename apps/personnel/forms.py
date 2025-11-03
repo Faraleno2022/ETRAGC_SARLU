@@ -8,7 +8,7 @@ class PersonnelForm(forms.ModelForm):
         model = Personnel
         fields = [
             'nom', 'prenom', 'telephone', 'telephone_2', 'email', 'adresse',
-            'fonction', 'type_contrat', 'salaire_journalier', 'date_embauche',
+            'fonction', 'type_contrat', 'salaire_journalier', 'salaire_convenu', 'date_embauche',
             'date_fin_contrat', 'photo', 'actif', 'notes'
         ]
         widgets = {
@@ -21,6 +21,7 @@ class PersonnelForm(forms.ModelForm):
             'fonction': forms.Select(attrs={'class': 'form-select'}),
             'type_contrat': forms.Select(attrs={'class': 'form-select'}),
             'salaire_journalier': forms.TextInput(attrs={'class': 'form-control money-input', 'inputmode': 'decimal'}),
+            'salaire_convenu': forms.TextInput(attrs={'class': 'form-control money-input', 'inputmode': 'decimal'}),
             'date_embauche': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_fin_contrat': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'photo': forms.FileInput(attrs={'class': 'form-control'}),

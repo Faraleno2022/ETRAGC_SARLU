@@ -104,30 +104,8 @@ class Transaction(models.Model):
         return f"{self.type} - {self.montant} GNF - {self.projet.code_projet}"
     
     def save(self, *args, **kwargs):
-        # Mettre à jour le budget du projet
+        # Sauvegarder la transaction
         super().save(*args, **kwargs)
-        
-        # Recalculer le solde du projet
-        from apps.projects.models import Projet
-        projet = Projet.objects.get(pk=self.projet.pk)
-        
-        # Calculer total dépôts
-        total_depots = Transaction.objects.filter(
-            projet=projet,
-            type='Dépôt',
-            statut='Validée'
-        ).aggregate(total=models.Sum('montant'))['total'] or 0
-        
-        # Calculer total retraits et dépenses
-        total_sorties = Transaction.objects.filter(
-            projet=projet,
-            type__in=['Retrait', 'Dépense'],
-            statut='Validée'
-        ).aggregate(total=models.Sum('montant'))['total'] or 0
-        
-        # Le montant_prevu représente le budget initial + dépôts - sorties
-        # On ne modifie pas montant_prevu, c'est le budget initial
-        # Les dépenses sont suivies via get_total_depenses()
     
     def get_absolute_url(self):
         return reverse('finances:transaction_detail', kwargs={'pk': self.pk})

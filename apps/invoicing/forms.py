@@ -7,13 +7,16 @@ class DevisForm(forms.ModelForm):
     """Formulaire pour les devis"""
     class Meta:
         model = Devis
-        fields = ['client', 'projet', 'date_emission', 'date_validite', 'montant_ht', 'conditions_paiement', 'notes']
+        fields = ['client', 'projet', 'date_emission', 'date_validite', 'montant_ht', 'appliquer_tva', 'taux_tva', 'statut', 'conditions_paiement', 'notes']
         widgets = {
             'client': forms.Select(attrs={'class': 'form-select'}),
             'projet': forms.Select(attrs={'class': 'form-select'}),
             'date_emission': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_validite': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'montant_ht': forms.TextInput(attrs={'class': 'form-control money-input', 'readonly': 'readonly', 'id': 'montant_ht_devis'}),
+            'appliquer_tva': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'taux_tva': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '18.00'}),
+            'statut': forms.Select(attrs={'class': 'form-select'}),
             'conditions_paiement': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }

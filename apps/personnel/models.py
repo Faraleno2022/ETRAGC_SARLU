@@ -77,6 +77,15 @@ class Personnel(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name='Salaire journalier'
     )
+    salaire_convenu = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0)],
+        verbose_name='Salaire convenu',
+        help_text='Montant total convenu avec l\'ouvrier pour un projet ou contrat'
+    )
     actif = models.BooleanField(
         default=True,
         verbose_name='Actif'
@@ -177,6 +186,26 @@ class Personnel(models.Model):
         salaire_du = self.get_salaire_du(projet)
         total_paye = self.get_total_paiements(projet)
         return salaire_du - total_paye
+    
+    def get_solde_salaire_convenu(self, projet=None):
+        """Calcule le solde restant basé sur le salaire convenu (salaire_convenu - paiements reçus)"""
+        from decimal import Decimal
+        
+        if not self.salaire_convenu:
+            return Decimal('0')
+        
+        total_paye = self.get_total_paiements(projet)
+        return self.salaire_convenu - total_paye
+    
+    def get_pourcentage_paye(self, projet=None):
+        """Calcule le pourcentage du salaire convenu déjà payé"""
+        from decimal import Decimal
+        
+        if not self.salaire_convenu or self.salaire_convenu == 0:
+            return Decimal('0')
+        
+        total_paye = self.get_total_paiements(projet)
+        return (total_paye / self.salaire_convenu) * Decimal('100')
     
     def get_paiements_par_projet(self):
         """Retourne un dictionnaire des paiements groupés par projet"""

@@ -136,51 +136,41 @@ class Projet(models.Model):
         return reverse('projects:detail', kwargs={'pk': self.pk})
     
     def get_total_depots(self):
-        """Retourne le total des dépôts"""
+        """Retourne le total des dépôts validés"""
         from apps.finances.models import Transaction
-        total = Transaction.objects.filter(
-            projet=self,
-            type='Dépôt'
-        ).aggregate(total=models.Sum('montant'))['total']
-        return total or 0
-    
-    def get_total_retraits(self):
-        """Retourne le total des retraits"""
-        from apps.finances.models import Transaction
-        total = Transaction.objects.filter(
-            projet=self,
-            type='Retrait'
-        ).aggregate(total=models.Sum('montant'))['total']
-        return total or 0
-    
-    def get_solde_disponible(self):
-        """Retourne le solde disponible"""
-        return self.get_total_depots() - self.get_total_retraits()
-    
-    def get_total_depenses(self):
-        """Retourne le total de toutes les dépenses (Dépenses + Achats + Retraits)"""
-        from apps.finances.models import Transaction
-        
-        # Total des transactions de type Dépense et Retrait
-        total_transactions = Transaction.objects.filter(
-            projet=self,
-            type__in=['Dépense', 'Retrait'],
-            statut='Validée'
-        ).aggregate(total=models.Sum('montant'))['total'] or 0
-        
-        return total_transactions
-    
-    def get_total_depots(self):
-        """Retourne le total des dépôts"""
-        from apps.finances.models import Transaction
-        
         total = Transaction.objects.filter(
             projet=self,
             type='Dépôt',
             statut='Validée'
+        ).aggregate(total=models.Sum('montant'))['total']
+        return total or 0
+    
+    def get_total_retraits(self):
+        """Retourne le total des retraits validés"""
+        from apps.finances.models import Transaction
+        total = Transaction.objects.filter(
+            projet=self,
+            type='Retrait',
+            statut='Validée'
+        ).aggregate(total=models.Sum('montant'))['total']
+        return total or 0
+    
+    def get_total_depenses(self):
+        """Retourne le total de toutes les dépenses (Dépenses + Achats + Paiements Personnel)"""
+        from apps.finances.models import Transaction
+        
+        # Total des transactions de type Dépense (inclut achats, dépenses, paiements personnel)
+        total_depenses = Transaction.objects.filter(
+            projet=self,
+            type='Dépense',
+            statut='Validée'
         ).aggregate(total=models.Sum('montant'))['total'] or 0
         
-        return total
+        return total_depenses
+    
+    def get_solde_disponible(self):
+        """Retourne le solde disponible (Dépôts - Retraits)"""
+        return self.get_total_depots() - self.get_total_retraits()
     
     def get_budget_disponible(self):
         """Retourne le budget disponible (Budget initial + Dépôts - Dépenses)"""

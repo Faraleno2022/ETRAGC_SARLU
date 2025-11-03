@@ -17,6 +17,8 @@ class Devis(models.Model):
         ('Accepté', 'Accepté'),
         ('Refusé', 'Refusé'),
         ('Expiré', 'Expiré'),
+        ('Gagné', 'Gagné'),
+        ('Perdu', 'Perdu'),
     ]
     
     numero_devis = models.CharField(
@@ -51,10 +53,16 @@ class Devis(models.Model):
         default=0.00,
         verbose_name='Montant HT'
     )
+    appliquer_tva = models.BooleanField(
+        default=True,
+        verbose_name='Appliquer la TVA'
+    )
     taux_tva = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         default=18.00,
+        blank=True,
+        null=True,
         verbose_name='Taux TVA (%)'
     )
     statut = models.CharField(
@@ -126,7 +134,9 @@ class Devis(models.Model):
     @property
     def montant_tva(self):
         """Calcule le montant de la TVA"""
-        return self.montant_ht * (Decimal(str(self.taux_tva)) / Decimal('100'))
+        if self.appliquer_tva and self.taux_tva:
+            return self.montant_ht * (Decimal(str(self.taux_tva)) / Decimal('100'))
+        return Decimal('0')
     
     @property
     def montant_ttc(self):
@@ -146,6 +156,8 @@ class Devis(models.Model):
             'Accepté': 'bg-success',
             'Refusé': 'bg-danger',
             'Expiré': 'bg-warning',
+            'Gagné': 'bg-success',
+            'Perdu': 'bg-danger',
         }
         return statut_classes.get(self.statut, 'bg-secondary')
     
